@@ -57,10 +57,10 @@ base_dir <- "."
 exclude_dirs <- c(
   "Images", "images", "bigrams", "data", "Data", "R", "scripts",
   "_extensions", "_site", "_cache", "_freeze",
-  "index_files", "index_b_files", "site_libs"
+  "index_files", "site_libs"
 )
 
-# Get subdirectories (competitions) from THIS repo
+# Get subdirectories (competitions)
 comp_dirs <- list.dirs(base_dir, recursive = FALSE, full.names = FALSE)
 
 # Keep only "real" folders
@@ -69,49 +69,28 @@ comp_dirs <- comp_dirs[!comp_dirs %in% exclude_dirs]             # remove non-co
 comp_dirs <- comp_dirs[!grepl("^Season\\s+\\d+$", comp_dirs)]     # optional: exclude Season folders
 comp_dirs <- sort(comp_dirs)
 
-# ---- Add external "Players" card (from a different repo) ----
-# This is a named list of extra cards you want alongside local folders.
-extra_cards <- list(
-  "Player Analysis" = "https://barts78.github.io/DrBartsPlayers/Season%202526/"
-)
-
-# Merge: local comps + extra card label(s)
-all_cards <- c(comp_dirs, names(extra_cards))
-all_cards <- unique(all_cards)
-all_cards <- sort(all_cards)
-
-# ---- Thumbnail map (card label -> image path) ----
+# ---- Thumbnail map (folder name -> image path) ----
 thumb_map <- c(
-  "EPL"        = "Images/EPL.png",
-  "FA Cup"     = "Images/FA_Cup.png",
-  "CL"         = "Images/UCL.png",
-  "League Cup" = "Images/League_cup.png",
-  "Specials"   = "Images/Premier-League-ball.png",
-  "Player Analysis"    = "Images/Players.png"
+  "EPL"      = "Images/EPL.png",
+  "FA Cup"   = "Images/FA_Cup.png",
+  "CL"      = "Images/UCL.png",
+  "League Cup"  = "Images/League_cup.png",
+  "Specials" = "Images/Premier-League-ball.png"
 )
 
 default_thumb <- "Images/Premier-League-ball.png"
 
-pick_thumb <- function(name) {
-  thumb <- unname(thumb_map[name])
+pick_thumb <- function(comp_name) {
+  thumb <- unname(thumb_map[comp_name])   # returns NA if not found
   if (is.na(thumb) || length(thumb) == 0) default_thumb else thumb
 }
 
-# Helper: URL for each card (local folder vs external)
-pick_url <- function(name) {
-  if (name %in% names(extra_cards)) {
-    extra_cards[[name]]
-  } else {
-    path <- gsub("\\\\", "/", file.path(name, "")) # "EPL/"
-    utils::URLencode(path)
-  }
-}
-
 # Build cards
-cards <- vapply(all_cards, function(name) {
+cards <- vapply(comp_dirs, function(comp) {
+  path <- gsub("\\\\", "/", file.path(comp, "")) # "EPL/"
+  url  <- utils::URLencode(path)
 
-  url   <- pick_url(name)
-  thumb <- pick_thumb(name)
+  thumb <- pick_thumb(comp)
 
   sprintf(
     paste0(
@@ -127,7 +106,7 @@ cards <- vapply(all_cards, function(name) {
       '  </div>\n',
       '</div>\n'
     ),
-    thumb, name, url, name
+    thumb, comp, url, comp
   )
 }, character(1))
 
