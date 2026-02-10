@@ -43,6 +43,8 @@ I am a part time football analyst specialising in the Quarto and R ecosystems.
 :::
 
 This is a home for my football visualisation work across **AI UP** and **TMM** pods.
+
+EPL Games for the **2025 - 2026** Season
 ::::
 ## Browse by Match Week / Round
 
