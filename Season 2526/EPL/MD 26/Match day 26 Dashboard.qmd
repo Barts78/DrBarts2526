@@ -1,5 +1,5 @@
 ---
-title: "Match day 25 Season 2526"
+title: "Match day 26 Season 2526"
 author: "Dr Phil Barter"
 format: 
   dashboard:
