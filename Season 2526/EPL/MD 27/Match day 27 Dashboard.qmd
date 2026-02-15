@@ -1,5 +1,5 @@
 ---
-title: "Match day 26 Season 2526"
+title: "Match day 27 Season 2526"
 author: "Dr Phil Barter"
 format: 
   dashboard:
@@ -102,23 +102,11 @@ Color_Home <- paste("red")
 #set Away text
 Color_Home_Text <- paste("black")
 
-#set away color scale
-ColorScale_Home <- paste("ggsci::red_material")
-
-#set away color scale con
-ColorScale_HomeC <- paste("ggthemes::Red")
-
 #set Home color
 Color_Away <- paste("#2E8B57")
 
 #set home text color
 Color_Away_Text <- paste("white")
-
-#set home color scale
-ColorScale_Away <- paste("ggsci::green_material")
-
-#set home color scale con
-ColorScale_AwayC <- paste("ggthemes::Green")
 
 #####################
 #load fonts
@@ -171,6 +159,63 @@ MC_League_Points <- 00
 HMOM = paste("")
 AMOM = paste("")
 
+
+#################################
+#set color palletes
+
+#set away color scale
+#ColorScale_Home <- paste("ggsci::red_material")
+
+#set away color scale con
+#ColorScale_HomeC <- paste("ggthemes::Red")
+
+#set home color scale
+#ColorScale_Away <- paste("ggsci::green_material")
+
+#set home color scale con
+#ColorScale_AwayC <- paste("ggthemes::Green")
+
+HomeplottingData <- plottingData %>% filter(TeamName == homeTeam)
+AwayplottingData <- plottingData %>% filter(TeamName == awayTeam)
+
+
+homeplayers <- sort(unique(as.character(HomeplottingData$playerId)))
+awayplayers <- sort(unique(as.character(AwayplottingData$playerId)))
+
+build_palette <- function(players,
+                          team_color,
+                          team_text_color = "#FFFFFF",
+                          PalType = c("D", "C"),
+                          n_c = 256) {
+  
+  PalType <- toupper(match.arg(PalType))
+  players <- unique(players)
+  ramp <- grDevices::colorRampPalette(c(team_text_color, team_color))
+  
+  if (PalType == "C") {
+    # Continuous: return an actual palette vector (for gradient scales)
+    return(ramp(n_c))
+  }
+  
+  # Discrete: named vector (player -> colour)
+  n <- length(players)
+  if (n == 0) return(setNames(character(0), character(0)))
+  if (n == 1) return(setNames(team_color, players))
+  
+  cols <- ramp(n)
+  names(cols) <- players
+  cols
+}
+
+ColorScale_HomeC <- build_palette(homeplayers, Color_Home, "white", "C")
+
+ColorScale_Home <- build_palette(homeplayers, Color_Home,  "white", "D")
+
+ColorScale_AwayC <- build_palette(awayplayers, Color_Away,  "white", "C")
+
+ColorScale_Away <- build_palette(awayplayers, Color_Away,  "white", "D")
+
+########################
 #set Waves titles
 WavesTitle_text <- paste0(
             glue("<span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:16px;'>{Match_Home}</span><span style='font-family:\"Arial\";color:gray12;font-size:16px;'> Attacking Waves </span><span style='color:gray12;font-size:16px;'>(</span><span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:16px;'>Touches</span><span style='color:gray12;font-size:16px;'>, </span><span style='font-family:\"Arial Bold\";color:ivory4;font-size:16px;'>Passes</span><span style='color:gray12;font-size:16px;'>, </span><span style='font-family:\"Arial Bold\";color:green3;font-size:16px;'>Shots</span><span style='color:gray12;font-size:16px;'>)</span>"))
@@ -697,7 +742,7 @@ PlayerPos <- PlayerPos %>%
   filter(!is.na(.data[[facet_by]]))
 
   player_touch_map <- ggplot(touch_area_data) +
-    annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+    annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
     theme_pitch() +
     annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
     annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -837,7 +882,7 @@ TouchTeamPlot_OPTA <- function(
     scale_fill_manual(values = pal) +
     scale_colour_manual(values = pal) +
 
-    annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+    annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
     theme_pitch() +
     annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9),
              x = 0, xend = 100, linewidth = 0.5, colour = "#95A5A6", linetype = "longdash") +
@@ -857,7 +902,7 @@ TouchTeamPlot_OPTA <- function(
       x = ""
     ) +
     theme(
-      strip.background = element_rect(fill = "#E5E5E5", 
+      strip.background = element_rect(fill = "#DBDBDB", 
       colour = NA), strip.text = element_text(colour = "black", size = 10), 
       plot.title = element_text(colour = "black", 
       size = 14, face = "bold"),
@@ -983,7 +1028,7 @@ plot_shot_AI <- function(data, type = "", teamColor = "#B22222", text_color = ""
   
 
     # set Plot Colours and scale
-    fill_b <- "#E5E5E5"
+    fill_b <- "#DBDBDB"
     pitch_lines <- "black"
     color_b <- teamColor
     colorLine <- "#95A5A6"
@@ -1479,7 +1524,7 @@ nodes <- nodes %>%
       plot_passnet <- ggplot() +
         
         #setup the pitch
-        annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+        annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
         theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -1689,7 +1734,7 @@ nodes <- nodes %>%
     plot_passnet <- ggplot() +
       
       #setup the pitch
-      annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+      annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
       theme_pitch() +
       annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
       annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -1977,10 +2022,10 @@ lineupdataHome <- MD_lineups %>%
   tab_source_note(md(My_caption)) %>%
   tab_style(
     style = list(cell_text(align = "right"), 
-                 cell_fill(color = "#E5E5E5")),
+                 cell_fill(color = "#DBDBDB")),
     locations = cells_body(columns = "Player")) %>%
     tab_style(
-    style = cell_text(color = "#E5E5E5"),
+    style = cell_text(color = "#DBDBDB"),
     locations = cells_column_labels('Player')) %>%
   tab_style(
     style = list(cell_text(weight = "bold", color = Color_Home_Text, align = "right"), cell_fill(color = Color_Home)),
@@ -1991,11 +2036,11 @@ lineupdataHome <- MD_lineups %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "Right",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 20,
     heading.subtitle.font.size = 14,
@@ -2032,11 +2077,11 @@ lineupdataAway <- MD_lineups %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "Left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 20,
     heading.subtitle.font.size = 14,
@@ -2279,11 +2324,11 @@ MatchSummaryTable <- MatchSummaryData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2346,11 +2391,11 @@ MatchSummaryHalfsTable <- MatchSummaryHalfData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2412,11 +2457,11 @@ MatchSummaryPeriodTable <- MatchSummaryPeriodData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2478,11 +2523,11 @@ MatchSummaryQuarterTable <- MatchSummaryQuarterData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2543,11 +2588,11 @@ MatchSummaryGameStateTable <- MatchSummaryGameStateData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2589,11 +2634,11 @@ MatchSummarySeasonTable <- MatchSummarySeasonData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "#B22222",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2655,11 +2700,11 @@ MatchSummarySeasonHalfsTable <- MatchSummarySeasonHalfData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2720,11 +2765,11 @@ MatchSummarySeasonPeriodTable <- MatchSummarySeasonPeriodData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2786,11 +2831,11 @@ MatchSummarySeasonGameStateTable <- MatchSummarySeasonGameStateData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -2850,11 +2895,11 @@ MatchSummaryGameNameData <- MatchSummaryGameNameData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = "ivory4",
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -3744,11 +3789,11 @@ PassConnectionTableHome <- PassConnectiondata %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -3797,11 +3842,11 @@ PassConnectionTableHomeR <- PassConnectiondata %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -3850,11 +3895,11 @@ PassConnectionTableAway <- PassConnectiondata %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -3902,11 +3947,11 @@ PassConnectionTableAwayr <- PassConnectiondata %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -3948,9 +3993,9 @@ PassConnectionTreeHomePlot <- PassConnectionTreeHome %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_HomeC) + 
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   labs(title = paste0(Match_Home, " Passing Connections (Min 5 passes)"), 
        subtitle = paste0(Match_Fixture, " Darker color = More Passes, \n Number & Name = Number Passes by Player, Large Name =  Reciever"),
        caption = my_socials) +
@@ -3996,9 +4041,9 @@ PassConnectionTreeAwayPlot <- PassConnectionTreeAway %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_AwayC) + 
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   labs(title = paste0(Match_Away, " Passing Connections (Min 5 passes)"), 
        subtitle = paste0(Match_Fixture, " Darker color = More Passes,  \n Number & Name = Number Passes by Player, Large Name =  Reciever"),
        caption = my_socials) +
@@ -4322,7 +4367,7 @@ passing_sequencesAway_2nd_Table <- passing_sequencesAway_2nd_Table %>%
 
 passing_sequencesHome_Plot <- passing_sequencesHome %>%
   ggplot(aes(x = x, y = y, group = Pchain)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -4367,7 +4412,7 @@ passing_sequencesHome_Plot
 
 passing_sequencesAway_Plot <- passing_sequencesAway %>%
   ggplot(aes(x = x, y = y, group = Pchain)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -4433,9 +4478,9 @@ Home_Passing_Chains_Table <- passing_sequencesHome_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Home,
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4474,9 +4519,9 @@ Home_Passing_Chains_1st_Table <- passing_sequencesHome_1st_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Home,
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4515,9 +4560,9 @@ Home_Passing_Chains_2nd_Table <- passing_sequencesHome_2nd_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Home,
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4556,9 +4601,9 @@ Away_Passing_Chains_Table <- passing_sequencesAway_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Away,
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4597,9 +4642,9 @@ Away_Passing_Chains_1st_Table <- passing_sequencesAway_1st_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Away,
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4638,9 +4683,9 @@ Away_Passing_Chains_2nd_Table <- passing_sequencesAway_2nd_Table %>%
     heading.align = "left",
     column_labels.background.color = Color_Away,
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 12,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -4765,7 +4810,7 @@ Z14_HS_Passes_Away_Data <- Z14_HS_Passes_Away_Data %>%
 #| label: Home Z14 RS By Half
 Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -4817,7 +4862,7 @@ Zone14_HS_Passes_Home_Plot
 
 Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -4871,7 +4916,7 @@ Zone14_HS_Passes_Home_Plot
 
 Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -4920,7 +4965,7 @@ Zone14_HS_Passes_Away_Plot
 #| label: Away Z14 RS By Game Period
 Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5004,7 +5049,7 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
            Corners == 0,
            Short_Corners == 0) %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5058,7 +5103,7 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
            Short_Corners == 0,
            Corners == 0) %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5114,7 +5159,7 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
            Corners == 0,
            Short_Corners == 0) %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5172,7 +5217,7 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
            Short_Corners == 0,
            Corners == 0) %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#95A5A6") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5232,7 +5277,7 @@ HomePRecievedHeatMapplot1Half <- plottingData %>%
          TeamName == Match_Home, 
          period == 1) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5248,8 +5293,7 @@ HomePRecievedHeatMapplot1Half <- plottingData %>%
   
   #set scales
   scale_fill_gradientn(colors = ColorScale_HomeC) +
-  #scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 1st Half"), 
@@ -5278,7 +5322,7 @@ HomePRecievedHeatMapplot2Half <- plottingData %>%
          TeamName == Match_Home, 
          period == 2) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5287,16 +5331,14 @@ HomePRecievedHeatMapplot2Half <- plottingData %>%
   #geometrics
 
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
   
   #set scales
   scale_fill_gradientn(colors = ColorScale_HomeC) +
-  #scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 2nd Half"), 
@@ -5327,7 +5369,7 @@ HomePRecievedHeatMapplot1Sub <- plottingData %>%
          TeamName == Match_Home, 
          between(minute, 00, firstSubHome)) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5343,8 +5385,7 @@ HomePRecievedHeatMapplot1Sub <- plottingData %>%
 
   #set scales
   scale_fill_gradientn(colors = ColorScale_HomeC) +
-  #scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 1st Subs"), 
@@ -5374,7 +5415,7 @@ AwayPRecievedHeatMapplot1Half <- plottingData %>%
          TeamName == Match_Away, 
          period == 1) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5390,7 +5431,7 @@ AwayPRecievedHeatMapplot1Half <- plottingData %>%
   #set scales
   scale_fill_gradientn(colors = ColorScale_AwayC) + 
   #scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Half"), 
@@ -5419,7 +5460,7 @@ AwayPRecievedHeatMapplot2Half <- plottingData %>%
          TeamName == Match_Away, 
          period == 2) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5437,7 +5478,7 @@ AwayPRecievedHeatMapplot2Half <- plottingData %>%
   #set scales
   scale_fill_gradientn(colors = ColorScale_AwayC) + 
   #scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 2nd Half"), 
@@ -5467,7 +5508,7 @@ AwayPRecievedHeatMapplot1Sub <- plottingData %>%
          TeamName == Match_Away, 
          between(minute, 00, firstSubAway)) %>%
   ggplot(aes(x = finalX, y = finalY)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -5482,8 +5523,8 @@ AwayPRecievedHeatMapplot1Sub <- plottingData %>%
   #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
 
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Subs"), 
@@ -6339,11 +6380,11 @@ MatchSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6404,11 +6445,11 @@ MatchSummaryPLayerTouchesTableHome <-
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6451,11 +6492,11 @@ MatchSummaryPLayerShootingTableHome <- MatchSummaryPLayerShootingData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6507,11 +6548,11 @@ MatchSummaryPLayerDefensiveTableHome <- MatchSummaryPLayerDefensiveData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6584,11 +6625,11 @@ SeasonSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingSeasonData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6648,11 +6689,11 @@ SeasonSummaryPLayerTouchesTableHome <-
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6695,11 +6736,11 @@ SeasonSummaryPLayerShootingTableHome <- MatchSummaryPLayerShootingSeasonData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6751,11 +6792,11 @@ SeasonSummaryPLayerDefensiveTableHome <- MatchSummaryPLayerDefensiveSeasonData %
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6821,11 +6862,11 @@ MatchSummaryPLayerPassingTableAway <- MatchSummaryPLayerPassingData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6884,11 +6925,11 @@ MatchSummaryPLayerTouchesTableAway <- MatchSummaryPLayerTouchesData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6929,11 +6970,11 @@ MatchSummaryPLayerShootingTableAway <- MatchSummaryPLayerShootingData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -6986,11 +7027,11 @@ MatchSummaryPLayerDefensiveTableAway <- MatchSummaryPLayerDefensiveData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -7063,11 +7104,11 @@ SeasonSummaryPLayerPassingTableAway <- MatchSummaryPLayerPassingSeasonData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -7127,11 +7168,11 @@ SeasonSummaryPLayerTouchesTableAway <-
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -7174,11 +7215,11 @@ SeasonSummaryPLayerShootingTableAway <- MatchSummaryPLayerShootingSeasonData %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -7230,11 +7271,11 @@ SeasonSummaryPLayerDefensiveTableAway <- MatchSummaryPLayerDefensiveSeasonData %
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -7444,7 +7485,7 @@ HomeDribblesPlotT <- HomeDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7487,7 +7528,7 @@ HomeDulesPlotT <- HomeDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
   annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7532,7 +7573,7 @@ AwayDribblesPlotT <- AwayDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7574,7 +7615,7 @@ AwayDulesPlotT <- AwayDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7619,7 +7660,7 @@ HomeDribblesPlotP <- HomeDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7663,7 +7704,7 @@ HomeDulesPlotP <- HomeDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7705,7 +7746,7 @@ AwayDribblesPlotP <- AwayDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7747,7 +7788,7 @@ AwayDulesPlotP <- AwayDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
   #geometrics
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
         annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -7793,8 +7834,7 @@ Player_Summary_Plot_Home <- Player_Summary_data_Home %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-   # scale_fill_paletteer_d(ColorScale_Home, 1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   geom_segment(
     aes(
       x = Metric,
@@ -7860,7 +7900,7 @@ Player_Summary_Plot_Home <- Player_Summary_data_Home %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   geom_segment(
     aes(
       x = Metric,
@@ -7925,7 +7965,7 @@ Player_Summary_Plot_Home <- Player_Summary_data_Home %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   geom_segment(
     aes(
       x = Metric,
@@ -7990,7 +8030,7 @@ Player_Summary_Plot_Home <- Player_Summary_data_Home %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   geom_segment(
     aes(
       x = Metric,
@@ -8059,7 +8099,8 @@ Player_Summary_Plot_Away <- Player_Summary_data_Away %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  #scale_fill_paletteer_c(ColorScale_AwayC, 1) +
   geom_segment(
     aes(
       x = Metric,
@@ -8130,7 +8171,8 @@ Player_Summary_Plot_Away <- Player_Summary_data_Away %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  #scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   geom_segment(
     aes(
       x = Metric,
@@ -8199,7 +8241,8 @@ Player_Summary_Plot_Away <- Player_Summary_data_Away %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  #scale_fill_paletteer_c(ColorScale_AwayC, 1) +
   geom_segment(
     aes(
       x = Metric,
@@ -8268,7 +8311,8 @@ Player_Summary_Plot_Away <- Player_Summary_data_Away %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  #scale_fill_paletteer_c(ColorScale_AwayC, 1) +
   geom_segment(
     aes(
       x = Metric,
@@ -8338,8 +8382,7 @@ Player_Summary_Plot_Home <- Player_Summary_data_A_MOM %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-   # scale_fill_paletteer_d(ColorScale_Home, 1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   geom_segment(
     aes(
       x = Metric,
@@ -8408,8 +8451,7 @@ Player_Summary_Plot_Away <- Player_Summary_data_MOM %>%
                y = Value,
                fill = Value), color = "gray4",
               linewidth = 0.1) +
-   # scale_fill_paletteer_d(ColorScale_Home, 1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   geom_segment(
     aes(
       x = Metric,
@@ -8883,7 +8925,7 @@ Awayaverage_epvNZFT <- Awayaverage_epvNZFT %>%
 #| label: Home EPV plot FT
 EPVHeatMapplotFT <- EPVHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -8904,8 +8946,8 @@ EPVHeatMapplotFT <- EPVHeatMapDataFT %>%
   geom_text(data = AwayAverage_PlayerFT, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
     #set scales
-   scale_fill_paletteer_c(ColorScale_HomeC) +
-   scale_color_paletteer_d(ColorScale_Home) +
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
 
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nFull Game"), 
@@ -8919,8 +8961,8 @@ EPVHeatMapplotFT <- EPVHeatMapDataFT %>%
         plot.subtitle = element_text(colour = "black", size = 12),
         legend.position = "none", 
         legend.direction = "horizontal", 
-        legend.background = element_rect(fill = "#E5E5E5"), 
-        legend.key = element_rect(fill = "#E5E5E5"))
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
 
 EPVHeatMapplotFT
 ```
@@ -8930,7 +8972,7 @@ EPVHeatMapplotFT
 #| label: Away EPV plot FT
 AwayEPVHeatMapplotFT <- AwayEPVHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -8950,8 +8992,9 @@ AwayEPVHeatMapplotFT <- AwayEPVHeatMapDataFT %>%
   #plot player names
   geom_text(data = Average_PlayerFT, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play EPV Heat Map \nFull Game"), 
@@ -9384,7 +9427,7 @@ Awayaverage_epvNZ2H <- Awayaverage_epvNZ2H %>%
 
 EPVHeatMapplot1H <- EPVHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9405,8 +9448,8 @@ EPVHeatMapplot1H <- EPVHeatMapData1H %>%
   geom_text(data = AwayAverage_Player1H, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
       
   #set scales
-   scale_fill_paletteer_c(ColorScale_HomeC) +
-   scale_color_paletteer_d(ColorScale_Home) + 
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) + 
   
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nFirst Half"), 
@@ -9435,7 +9478,7 @@ EPVHeatMapplot1H
 
 EPVHeatMapplot2H <- EPVHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9456,8 +9499,8 @@ EPVHeatMapplot2H <- EPVHeatMapData2H %>%
   geom_text(data = AwayAverage_Player2H, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-   scale_fill_paletteer_c(ColorScale_HomeC) +
-   scale_color_paletteer_d(ColorScale_Home) +
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nSecond Half"), 
@@ -9486,7 +9529,7 @@ EPVHeatMapplot2H
 #| title: Away Threat 1st Half
 AwayEPVHeatMapplot1H <- AwayEPVHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9506,8 +9549,9 @@ AwayEPVHeatMapplot1H <- AwayEPVHeatMapData1H %>%
   
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play EPV Heat Map \nFirst Half"), 
@@ -9535,7 +9579,7 @@ AwayEPVHeatMapplot1H
 #| title: Threat 2nd Half
 AwayEPVHeatMapplot2H <- AwayEPVHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9553,8 +9597,9 @@ AwayEPVHeatMapplot2H <- AwayEPVHeatMapData2H %>%
   geom_text(data = Average_Player2H, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play EPV Heat Map \nSecond Half"), 
@@ -9583,7 +9628,7 @@ AwayEPVHeatMapplot2H
 #| title: Threat to 1st Sub
 EPVHeatMapplot1sub <- EPVHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9604,8 +9649,8 @@ EPVHeatMapplot1sub <- EPVHeatMapData1sub %>%
   geom_text(data = AwayAverage_Player1Sub, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-   scale_fill_paletteer_c(ColorScale_HomeC) +
-   scale_color_paletteer_d(ColorScale_Home) +
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nUp to first subs"), 
@@ -9632,7 +9677,7 @@ EPVHeatMapplot1sub
 #| title: Threat Post 1st Sub
 EPVHeatMapplotP1sub <- EPVHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9653,8 +9698,8 @@ EPVHeatMapplotP1sub <- EPVHeatMapDataP1sub %>%
   geom_text(data = AwayAverage_PlayerP1Sub, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-   scale_fill_paletteer_c(ColorScale_HomeC) +
-   scale_color_paletteer_d(ColorScale_Home) +
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nPost 1st Subs"), 
@@ -9680,7 +9725,7 @@ EPVHeatMapplotP1sub
 #| title: Threat to 1st Sub
 AwayEPVHeatMapplot1sub <- AwayEPVHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9701,8 +9746,9 @@ AwayEPVHeatMapplot1sub <- AwayEPVHeatMapData1sub %>%
   geom_text(data = Average_Player1Sub, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play EPV Heat Map \nUp to 1st Subs"), 
@@ -9729,7 +9775,7 @@ AwayEPVHeatMapplot1sub
 #| title: Threat Post 1st Sub
 AwayEPVHeatMapplotP1sub <- AwayEPVHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9750,8 +9796,9 @@ AwayEPVHeatMapplotP1sub <- AwayEPVHeatMapDataP1sub %>%
   geom_text(data = Average_PlayerP1Sub, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play EPV Heat Map \nPost 1st Subs"), 
@@ -9874,7 +9921,7 @@ Awayaverage_epvNZFTW <- Awayaverage_epvNZFTW %>%
 ```{r}
 EPVHeatMapplotFTW <- EPVHeatMapDataFTW %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9888,8 +9935,8 @@ EPVHeatMapplotFTW <- EPVHeatMapDataFTW %>%
   geom_text(data = average_epvNZFTW, aes(x = x, y = y, label = paste(PEPV, "%")), size = 2,  color = "black") +
   
   #scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #wrap
   facet_wrap(~Game_Period, ncol = 4) +
@@ -9915,7 +9962,7 @@ EPVHeatMapplotFTW
 ```{r}
 AwayEPVHeatMapplotFTW <- AwayEPVHeatMapDataFTW %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -9928,8 +9975,9 @@ AwayEPVHeatMapplotFTW <- AwayEPVHeatMapDataFTW %>%
   geom_text(data = Awayaverage_epvNZFTW, aes(x = x, y = y, label = paste(PEPV, "%")), size = 2, color = "black") +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #wrap
   facet_wrap(~Game_Period, ncol = 4) +
@@ -9978,11 +10026,11 @@ EPVPassEventsTop5TableHome <- EPVPassEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10019,11 +10067,11 @@ EPVPassEventsBottom5TableHome <- EPVPassEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10061,11 +10109,11 @@ EPVCarrieEventsTop5TableHome <- EPVCarrieEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10102,11 +10150,11 @@ EPVCarrieEventsBottom5TableHome <- EPVCarrieEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10145,11 +10193,11 @@ EPVPassEventsTop5TableAway <- EPVPassEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10186,11 +10234,11 @@ EPVPassEventsBottom5TableAway <- EPVPassEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10228,11 +10276,11 @@ EPVCarrieEventsTop5TableAway <- EPVCarrieEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10269,11 +10317,11 @@ EPVCarrieEventsBottom5TableAway <- EPVCarrieEvents %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -10458,7 +10506,7 @@ PPDAMapplotFT <- ggplot(average_PPDAFT, aes(x = zone_x, y = zone_y, fill = avg_P
   #geometrics
   geom_tile() +
   geom_text(aes(label = PPDA, size = 3)) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map - Full Game"), 
@@ -10472,8 +10520,8 @@ PPDAMapplotFT <- ggplot(average_PPDAFT, aes(x = zone_x, y = zone_y, fill = avg_P
         plot.subtitle = element_text(colour = "black", size = 12),
         legend.position = "none", 
         legend.direction = "horizontal", 
-        legend.background = element_rect(fill = "#E5E5E5"), 
-        legend.key = element_rect(fill = "#E5E5E5"))
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
 
 #calculate for combined tile and heat map
 average_PPDANZFT <- average_PPDAFT %>%
@@ -10549,7 +10597,7 @@ Awayaverage_PPDANZFT <- Awayaverage_PPDANZFT %>%
 #| height: 100%
 HomePPDAHeatMapplotFT <- HomePPDAHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10570,8 +10618,8 @@ HomePPDAHeatMapplotFT <- HomePPDAHeatMapDataFT %>%
 
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nFull Game"), 
@@ -10585,8 +10633,8 @@ HomePPDAHeatMapplotFT <- HomePPDAHeatMapDataFT %>%
         plot.subtitle = element_text(colour = "black", size = 12),
         legend.position = "none", 
         legend.direction = "horizontal", 
-        legend.background = element_rect(fill = "#E5E5E5"), 
-        legend.key = element_rect(fill = "#E5E5E5"))
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
 
 HomePPDAHeatMapplotFT
 ```
@@ -10595,7 +10643,7 @@ HomePPDAHeatMapplotFT
 #| height: 100%
 AwayPPDAHeatMapplotFT <- AwayPPDAHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10615,8 +10663,9 @@ AwayPPDAHeatMapplotFT <- AwayPPDAHeatMapDataFT %>%
   geom_text(data = Average_PlayerFT, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play Defensive Actions Heat Map \nFull Game"), 
@@ -10817,7 +10866,7 @@ Awayaverage_PPDANZP1sub <- Awayaverage_PPDANZP1sub %>%
 #| height: 100%
 HomePPDAHeatMapplot1sub <- HomePPDAHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10828,8 +10877,7 @@ HomePPDAHeatMapplot1sub <- HomePPDAHeatMapData1sub %>%
   geom_point(data = AwayAverage_Player1Sub, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
@@ -10838,8 +10886,8 @@ HomePPDAHeatMapplot1sub <- HomePPDAHeatMapData1sub %>%
   geom_text(data = AwayAverage_Player1Sub, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nUp to first subs"), 
@@ -10864,7 +10912,7 @@ HomePPDAHeatMapplot1sub
 #| label: home Defensive actions Post 1st Sub
 HomePPDAHeatMapplotP1sub <- HomePPDAHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10885,8 +10933,8 @@ HomePPDAHeatMapplotP1sub <- HomePPDAHeatMapDataP1sub %>%
   geom_text(data = AwayAverage_PlayerP1Sub, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nPost 1st Subs"), 
@@ -10912,7 +10960,7 @@ HomePPDAHeatMapplotP1sub
 #| label: Away Defensive actions to 1st Sub
 AwayPPDAHeatMapplot1sub <- AwayPPDAHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10933,8 +10981,9 @@ AwayPPDAHeatMapplot1sub <- AwayPPDAHeatMapData1sub %>%
   geom_text(data = Average_Player1Sub, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play Defensive Actions Heat Map \nUp to 1st Subs"), 
@@ -10959,7 +11008,7 @@ AwayPPDAHeatMapplot1sub
 #| label: Away Defensive actions Post 1st Sub
 AwayPPDAHeatMapplotP1sub <- AwayPPDAHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -10980,8 +11029,9 @@ AwayPPDAHeatMapplotP1sub <- AwayPPDAHeatMapDataP1sub %>%
   geom_text(data = Average_PlayerP1Sub, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play Defensive Actions Heat Map \nPost 1st Subs"), 
@@ -11172,13 +11222,13 @@ Awayaverage_PPDANZ2H <- Awayaverage_PPDANZ2H %>%
 ```
 ### column {.tabset}
 ```{r}
-#| title: home Defensive actions 1st Half
+#| title: Home Defensive actions 1st Half
 #| label: Home  Defensive actions 1st Half
 #| height: 100%
 
 HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11189,8 +11239,7 @@ HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   geom_point(data = AwayAverage_Player1H, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   geom_text(data = average_PPDANZ1H, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
@@ -11199,8 +11248,8 @@ HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   geom_text(data = AwayAverage_Player1H, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) + 
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) + 
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nFirst Half"), 
@@ -11224,13 +11273,13 @@ HomePPDAHeatMapplot1H
 ```
 
 ```{r}
-#| title: home Defensive actions 2nd Half
-#| label: home Defensive actions 2nd Half
+#| title: Home Defensive actions 2nd Half
+#| label: Home Defensive actions 2nd Half
 #| height: 100%
 
 HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11241,8 +11290,7 @@ HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
   geom_point(data = AwayAverage_Player2H, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   geom_text(data = average_PPDANZ2H, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
@@ -11251,8 +11299,8 @@ HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
   geom_text(data = AwayAverage_Player2H, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_HomeC) +
-  scale_color_paletteer_d(ColorScale_Home) + 
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) + 
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nSecond Half"), 
@@ -11282,7 +11330,7 @@ HomePPDAHeatMapplot2H
 #| height: 100%
 AwayPPDAHeatMapplot1H <- AwayPPDAHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11303,8 +11351,9 @@ AwayPPDAHeatMapplot1H <- AwayPPDAHeatMapData1H %>%
   geom_text(data = Average_Player1H, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  #scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play Defensive Actions Heat Map \nFirst Half"), 
@@ -11333,7 +11382,7 @@ AwayPPDAHeatMapplot1H
 #| height: 100%
 AwayPPDAHeatMapplot2H <- AwayPPDAHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11354,8 +11403,8 @@ AwayPPDAHeatMapplot2H <- AwayPPDAHeatMapData2H %>%
   geom_text(data = Average_Player2H, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
   
   #set scales
-  scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_paletteer_d(ColorScale_Away) +
+  scale_fill_gradientn(colors = ColorScale_AwayC)+
+  scale_color_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away," Open Play Defensive Actions Heat Map \nSecond Half"), 
@@ -11850,7 +11899,7 @@ Away_Successful_AD_table_PP <- Away_player_receiver %>%
 HomePostPPDAHeatMapplot1st <- Home_Successful_Post_DA_Action %>%
   filter(period_displayName == "First Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11883,7 +11932,7 @@ HomePostPPDAHeatMapplot1st <- Home_Successful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste(Match_Home,"Passes or Carries Post Successful DA - 1st Half"), 
@@ -11913,11 +11962,11 @@ HomeSuccessful_DA_table <- Home_Successful_DA_table %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -11940,7 +11989,7 @@ HomeSuccessful_DA_table
 HomePostPPDAHeatMapplot2nd <- Home_Successful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11973,7 +12022,7 @@ HomePostPPDAHeatMapplot2nd <- Home_Successful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste(Match_Home,"Passes or Carries Post Successful DA - 2nd Half"), 
@@ -12008,7 +12057,7 @@ HomeSuccessful_DA_table
 AwayPostPPDAHeatMapplot1st <- Away_Successful_Post_DA_Action %>%
     filter(period_displayName == "First Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12042,7 +12091,7 @@ AwayPostPPDAHeatMapplot1st <- Away_Successful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away,"Passes or Carries Post Successful DA - 1st Half"), 
@@ -12072,11 +12121,11 @@ AwaySuccessful_DA_table <- Away_Successful_DA_table %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -12097,7 +12146,7 @@ AwaySuccessful_DA_table
 AwayPostPPDAHeatMapplot2nd <- Away_Successful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12130,7 +12179,7 @@ AwayPostPPDAHeatMapplot2nd <- Away_Successful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   
   #formatting
   labs(title = paste(Match_Away,"Passes or Carries Post Successful DA - 2nd Half"), 
@@ -12164,7 +12213,7 @@ AwaySuccessful_DA_table
 HomeUNPostPPDAHeatMapplot_1st <- Home_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "First Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12199,7 +12248,7 @@ HomeUNPostPPDAHeatMapplot_1st <- Home_Unsuccessful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste(Match_Home,"Oppo Passes or Carries Post Successful DA - 1st Half"), 
@@ -12229,11 +12278,11 @@ HomeUnSuccessful_DA_table <- Home_UnSuccessful_DA_table %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -12254,7 +12303,7 @@ HomeUnSuccessful_DA_table
 HomeUNPostPPDAHeatMapplot2nd <- Home_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   #geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12289,7 +12338,7 @@ HomeUNPostPPDAHeatMapplot2nd <- Home_Unsuccessful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #formatting
   labs(title = paste(Match_Home,"Oppo Passes or Carries Post Successful DA - 2nd Half"), 
@@ -12324,7 +12373,7 @@ HomeUnSuccessful_DA_table
 AwayPostPPDAHeatMapplot1st <- Away_Unsuccessful_Post_DA_Action %>%
     filter(period_displayName == "First Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12336,7 +12385,7 @@ AwayPostPPDAHeatMapplot1st <- Away_Unsuccessful_Post_DA_Action %>%
   stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
     #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   
   #plot next pass or carrie
   scale_x_reverse() +
@@ -12389,11 +12438,11 @@ AwayUnSuccessful_DA_table<- Away_UnSuccessful_DA_table %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -12414,7 +12463,7 @@ AwayUnSuccessful_DA_table
 AwayPostPPDAHeatMapplot2nd <- Away_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12427,7 +12476,7 @@ AwayPostPPDAHeatMapplot2nd <- Away_Unsuccessful_Post_DA_Action %>%
   
   #set scales
   scale_size(range = c(0.5, 2)) +
-  scale_fill_paletteer_c(ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   
   #plot next pass or carrie
   scale_x_reverse() +
@@ -12499,9 +12548,9 @@ PostDAHomePlot <- Home_Successful_DA_table_PP %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_HomeC) + 
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   labs(title = paste0(Match_Home, " Successful Post DAs (Tackles, Turnovers, Interceptions, Recoverys, Clearances, Fouls, Challenges) - Possession Regains"), 
        subtitle = paste0(Match_Fixture," Darker color = Number of DAs, \n Number & Name = % of DA Winners Total Received by Player, Large Name =  DA Winner"),
        caption = my_socials) +
@@ -12540,9 +12589,9 @@ PostDAAwayPlot <- Away_Successful_DA_table_PP %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_AwayC) + 
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   labs(title = paste0(Match_Away, " Successful Post DAs (Tackles, Turnovers, Interceptions, Recoverys, Clearances, Fouls, Challenges) - Possession Regains"), 
        subtitle = paste0(Match_Fixture," Darker color = Number of DAs, \n Number & Name = % of DA Winners Total Received by Player, Large Name =  DA Winner"),
        caption = my_socials) +
@@ -12583,9 +12632,9 @@ PostADHomePlot <- Home_Successful_AD_table_PP %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_HomeC) + 
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   labs(title = paste0(Match_Home, " Successful Post Aerial - Possession Regains"), 
        subtitle = paste0(Match_Fixture, " Out of Play AD excluded, Darker color = Number of ADs, \n Number & Name = % of AD Winners Total Received by Player, Large Name =  AD Winner"),
        caption = my_socials) +
@@ -12624,11 +12673,11 @@ Home_AD_Regain_table<- Home_Successful_AD_table_PP %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Home,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -12661,9 +12710,9 @@ PostADAwayPlot <- Away_Successful_AD_table_PP %>%
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
-        plot.background = element_rect(colour = "black", fill = "#E5E5E5"),
+        plot.background = element_rect(colour = "black", fill = "#DBDBDB"),
         panel.background = element_blank()) +
-  scale_fill_paletteer_c(ColorScale_AwayC) + 
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   labs(title = paste0(Match_Away, " Successful Post Aerial - Possession Regains"), 
        subtitle = paste0(Match_Fixture, " Out of Play AD excluded,Darker color = Number of ADs, \n Number & Name = % of AD Winners Total Received by Player, Large Name =  AD Winner"),
        caption = my_socials) +
@@ -12703,11 +12752,11 @@ Away_AD_Regain_table <- Away_Successful_AD_table_PP %>%
   tab_options(
     heading.padding = px(1),
     heading.align = "left",
-    column_labels.background.color = "#E5E5E5",
+    column_labels.background.color = "#DBDBDB",
     row_group.background.color = Color_Away,
-    stub.background.color = "#E5E5E5",
+    stub.background.color = "#DBDBDB",
     column_labels.border.bottom.color = "black",
-    summary_row.background.color = "#E5E5E5",
+    summary_row.background.color = "#DBDBDB",
     table.font.size = 14,
     heading.title.font.size = 16,
     heading.subtitle.font.size = 14,
@@ -12956,7 +13005,7 @@ xGLinePlotAway
 #canvas
 xGDensityPlot <- dashboard_data %>%
   ggplot(aes(x = X, y = Y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -12970,8 +13019,8 @@ xGDensityPlot <- dashboard_data %>%
                    ylim = c(100, 00)) +
   #geometrics
   stat_density_2d(aes(fill = after_stat(level), text = paste("xG: ", ..level..)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  scale_color_paletteer_c(ColorScale_HomeC) +
-  scale_fill_paletteer_c(ColorScale_HomeC) +
+  scale_color_gradientn(colors = ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   guides(fill = guide_legend(title = "xG Level")) +
   guides(color = guide_legend(title = "xG Level")) +
   scale_size_continuous(range = c(0.5, 7)) +
@@ -13015,7 +13064,7 @@ xGDensityPlot
 #canvas
 xGDensityPlotAway <- Awaydashboard_data %>%
   ggplot(aes(x = X, y = Y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
         annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -13030,8 +13079,9 @@ xGDensityPlotAway <- Awaydashboard_data %>%
                    ylim = c(100, 00)) + 
   #geometrics
   stat_density_2d(aes(fill = after_stat(level), text = paste("xG: ", ..level..)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  scale_color_paletteer_c(ColorScale_AwayC) +
-  scale_fill_paletteer_c(ColorScale_AwayC) +
+  #scale_color_paletteer_c(ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
   guides(fill = guide_legend(title = "xG Level")) +
   guides(color = guide_legend(title = "xG Level")) +
   scale_size_continuous(range = c(0.5, 7)) +
@@ -13128,8 +13178,7 @@ sizeRange <- c(2, 10)
   scale_shape_manual(values = c( "xG" = 21, "EPV" = 23)) +  # Assign different shapes
 
   #colors
-  #scale_fill_paletteer_d(ColorScale_Home, 1) +
-  scale_fill_paletteer_c(ColorScale_HomeC, 1) +
+  scale_fill_gradientn(colors = ColorScale_HomeC) +
   
   #Scale and limits
   scale_size(range = sizeRange) +
@@ -13227,7 +13276,8 @@ sizeRange <- c(2, 10)
     
   #colors
   #scale_fill_paletteer_d(ColorScale_Away, -1) +
-  scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  #scale_fill_paletteer_c(ColorScale_AwayC, 1) +
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
 
   #Scale and limits
   scale_size(range = sizeRange) +
