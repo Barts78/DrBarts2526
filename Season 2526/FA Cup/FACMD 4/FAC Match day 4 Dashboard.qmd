@@ -5988,111 +5988,78 @@ Player_Goal_data_Away <- Player_Goal_data_Away %>%
 #| warning: false
 #| label: player Season stats tables setup
 
-MatchSummaryPLayerSeasonData <- SeasonData %>%
+PlayerMatchRole <- SeasonData %>%
   mutate(
     Out_of_play_time = round(Out_of_play_time / 60, 1),
     EventTime = round(EventTime / 60, 1),
-    TeamEPV = as.numeric(ifelse(str_detect(`outcomeType/value`, "1"), paste0(EPVvalue), 0))) %>%
-  group_by(TeamName, playerId, role, player_shirt) %>%
-    summarise(
-    across(
-      c(Goals, 
-        TotalShots, 
-        OFShots, 
-        SoT = OTShots, 
-        Out_Box_Shots, 
-        Touches, 
-        Defensive_Third_Touches, 
-        Middle_Third_Touches, 
-        Final_Third_Touches, 
-        PK_Box_Touches, 
-        SixYard_Box_Touches, 
-        Attempted_Carries, 
-        Successful_Carries, 
-        Prog_Carries, 
-        Final_Third_Carries, 
-        Attempted_Passes, 
-        Successful_Passes, 
-        Long_Passes, 
-        Final_Third_Passes, 
-        PK_Box_Passes,
-        Prog_Passes,
-        Key_Passes,
-        Assists,
-        BCs,
-        TeamEPV,   
-        xG, 
-        xGOT, 
-        MyxA,
-        TeamxT,
-        Aerial_total, 
-        Aerial_Won, 
-        Aerial_Lost, 
-        Ground_Duels_Total, 
-        Ground_Duels_Won, 
-        Ground_Duels_Lost,
-        UnSuccessful_Touches,
-        Attacking_Half_Touches, 
-        Defensive_Half_Touches, 
-        Mis_Control, 
-        Dispossessed_Total, 
-        Dribbles_Total, 
-        Dribbles_Won, 
-        Dribbles_Lost,
-        Blocked_Shot,
-        SixYard_Box_Shots, 
-        PK_Box_Shots, 
-        NPxG,
-        UnSuccessful_Passes,
-        Successful_Long_Passes, 
-        Corners, 
-        Short_Corners, 
-        Cross_Passes, 
-        Successful_Cross, 
-        UnSuccessful_Cross, 
-        Tackles_Total, 
-        Tackles_Won, 
-        Tackles_Lost, 
-        Fouls_Total, 
-        Fouls_Conceeded, 
-        Fouls_Received,
-        Interceptions_Total, 
-        Recoverys_Total,
-        Clearances_Total,
-        Offside_Won, 
-        Offside_Lost
-        ), 
-      \(x) sum(x, na.rm = TRUE)
-    ),
-    minutes_played = min(minutes_played, na.rm = TRUE),
-    Carries_distance = sum(Carries_distance, na.rm = TRUE),
-    Successful_Carries_Distance = sum(Successful_Carries_Distance, na.rm = TRUE),
-    Prog_Carries_Distance = sum(Prog_Carries_Distance, na.rm = TRUE)
+    TeamEPV = if_else(`outcomeType/value` == 1, as.numeric(EPVvalue), 0)
   ) %>%
-  ungroup() %>%
+  group_by(TeamName, playerId, role, player_shirt, game_name) %>%
+  summarise(
+    minutes_played = min(minutes_played, na.rm = TRUE),
+    across(
+      c(Goals, TotalShots, OFShots, SoT = OTShots, Out_Box_Shots, Touches,
+        Defensive_Third_Touches, Middle_Third_Touches, Final_Third_Touches,
+        PK_Box_Touches, SixYard_Box_Touches, Attempted_Carries, Successful_Carries,
+        Prog_Carries, Final_Third_Carries, Attempted_Passes, Successful_Passes,
+        Long_Passes, Final_Third_Passes, PK_Box_Passes, Prog_Passes, Key_Passes,
+        Assists, BCs, TeamEPV, xG, xGOT, MyxA, TeamxT, Aerial_total, Aerial_Won,
+        Aerial_Lost, Ground_Duels_Total, Ground_Duels_Won, Ground_Duels_Lost,
+        UnSuccessful_Touches, Attacking_Half_Touches, Defensive_Half_Touches,
+        Mis_Control, Dispossessed_Total, Dribbles_Total, Dribbles_Won, Dribbles_Lost,
+        Blocked_Shot, SixYard_Box_Shots, PK_Box_Shots, NPxG, UnSuccessful_Passes,
+        Successful_Long_Passes, Corners, Short_Corners, Cross_Passes, Successful_Cross,
+        UnSuccessful_Cross, Tackles_Total, Tackles_Won, Tackles_Lost, Fouls_Total,
+        Fouls_Conceeded, Fouls_Received, Interceptions_Total, Recoverys_Total,
+        Clearances_Total, Offside_Won, Offside_Lost, Carries_distance,
+        Successful_Carries_Distance, Prog_Carries_Distance),
+      ~ sum(.x, na.rm = TRUE)
+    ),
+    .groups = "drop"
+  )
+
+MatchSummaryPLayerSeasonData <- PlayerMatchRole %>%
+  group_by(TeamName, playerId, role, player_shirt) %>%
+  summarise(
+    Matches_Played = n_distinct(game_name),
+    minutes_played = sum(minutes_played, na.rm = TRUE),
+
+    across(
+      -c(game_name, Matches_Played, minutes_played),
+      ~ sum(.x, na.rm = TRUE)
+    ),
+
+    .groups = "drop"
+  )
+
+MatchSummaryPLayerSeasonData <- MatchSummaryPLayerSeasonData %>%
   group_by(TeamName) %>%
   mutate(
-    Team_TotalTouches = sum(Touches),
-    Team_TotalEPV = sum(TeamEPV),
-    Team_TotalxG = sum(xG),
-    Team_TotalPasses = sum(Attempted_Passes),
-    Team_TotalDuels = sum(Ground_Duels_Total),
-    Team_TotalAerials = sum(Aerial_total),
-    Team_TotalShots = sum(TotalShots),
-    Possession = round((Touches / Team_TotalTouches), 2),
-    Pass_Success = round((Successful_Passes / Attempted_Passes), 2),
-    Aerial_Success = (Aerial_Won / Aerial_total),
-    Duel_Success = (Ground_Duels_Won / Ground_Duels_Total),
-    On_Ball_Time = round(InPlayTime * Possession,2),
-    Team_EPV_P = round((TeamEPV / Team_TotalEPV), 2),
-    Team_xG_P = round((xG / Team_TotalxG), 2),
-    Team_Duels_P = round((Ground_Duels_Total / Team_TotalDuels), 2),
-    Team_Aerial_P = round((Aerial_total / Team_TotalAerials), 2),
-    Team_Passes_P = round((Attempted_Passes / Team_TotalPasses), 2),
-    Team_Shots_P = round((TotalShots / Team_TotalShots), 2)
+    Team_TotalTouches  = sum(Touches, na.rm = TRUE),
+    Team_TotalEPV      = sum(TeamEPV, na.rm = TRUE),
+    Team_TotalxG       = sum(xG, na.rm = TRUE),
+    Team_TotalPasses   = sum(Attempted_Passes, na.rm = TRUE),
+    Team_TotalDuels    = sum(Ground_Duels_Total, na.rm = TRUE),
+    Team_TotalAerials  = sum(Aerial_total, na.rm = TRUE),
+    Team_TotalShots    = sum(TotalShots, na.rm = TRUE),
+
+    Possession   = round(Touches / Team_TotalTouches, 2),
+    Pass_Success = round(Successful_Passes / Attempted_Passes, 2),
+    Aerial_Success = Aerial_Won / Aerial_total,
+    Duel_Success   = Ground_Duels_Won / Ground_Duels_Total,
+
+    On_Ball_Time = round(InPlayTime * Possession, 2),
+
+    Team_EPV_P    = round(TeamEPV / Team_TotalEPV, 2),
+    Team_xG_P     = round(xG / Team_TotalxG, 2),
+    Team_Duels_P  = round(Ground_Duels_Total / Team_TotalDuels, 2),
+    Team_Aerial_P = round(Aerial_total / Team_TotalAerials, 2),
+    Team_Passes_P = round(Attempted_Passes / Team_TotalPasses, 2),
+    Team_Shots_P  = round(TotalShots / Team_TotalShots, 2)
   ) %>%
-  replace_na(list( Aerial_Success = 0)) %>%
-  replace_na(list( Duel_Success = 0)) %>%
+  mutate(
+    across(c(Aerial_Success, Duel_Success, Pass_Success), ~ replace_na(.x, 0))
+  ) %>%
   ungroup()
 
 MD_adv_passing <- SeasonData 
@@ -6204,7 +6171,6 @@ MatchSummaryPLayerSeasonData <- MatchSummaryPLayerSeasonData %>%
 MatchSummaryPLayerSeasonData <- MatchSummaryPLayerSeasonData %>%
     replace_na(list( EPV_Faced = 0, EPV_Won = 0, EPV_Lost = 0)) 
 
-
 #subset for standard player stats data table 1
 MatchSummaryPLayerPassingSeasonData <- MatchSummaryPLayerSeasonData
 
@@ -6313,11 +6279,131 @@ MatchSummaryPLayerDefensiveSeasonData <- MatchSummaryPLayerDefensiveSeasonData %
          'EPV Won'  = EPV_Won, 
          'EPV Lost' = EPV_Lost,
          'Possession Control' = Posession_Control)
+
+########### for P90 data
+
+MatchSummaryPLayerSeasonDataP90 <- MatchSummaryPLayerSeasonData %>%
+  mutate(P90 = (minutes_played / 90),
+         across(7:120, ~ round(.x / P90, 2)),
+         Pass_Success = round((Successful_Passes / Attempted_Passes), 2),
+         Aerial_Success = (Aerial_Won / Aerial_total),
+         Duel_Success = (Ground_Duels_Won / Ground_Duels_Total),
+         receiving_Suc = (Successful_Recieved / Passes_Recieved),
+         across(c(Aerial_Success, Duel_Success, Pass_Success, receiving_Suc), ~ replace_na(.x, 0)))
+
+#subset for standard player stats data table 1
+MatchSummaryPLayerPassingSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
+
+#subset for detailed player stats data table 2
+MatchSummaryPLayerTouchesSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
+
+#subset for detailed player stats data table 3
+MatchSummaryPLayerShootingSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
+
+#subset for detailed player stats data table 4
+MatchSummaryPLayerDefensiveSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
+
+#sub set for player profile plots
+MatchSummaryPLayerProfileSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
+
+#data wrangling for general player stat table 1
+MatchSummaryPLayerPassingSeasonDataP90 <- MatchSummaryPLayerPassingSeasonDataP90 %>%
+  select(Team = TeamName, 
+         Position = role, 
+         Name = playerId, 
+         Mins = minutes_played, 
+         '% of Team Possession' = Possession, 
+         xA = MyxA, 
+         xT = TeamxT,  
+         'Attempted Passes' = Attempted_Passes, 
+         'Successful Passes' = Successful_Passes, 
+         'Pass Success %' = Pass_Success, Assists, 
+         BCs, 
+         'Key Passes' = Key_Passes, 
+         `Long Ps`  = Long_Passes, 
+         `Final 3rd P` = Final_Third_Passes, 
+         `Prog Ps` = Prog_Passes, 
+         'PK Box P' = PK_Box_Passes, 
+         `Pass Received` = Passes_Recieved, 
+         `PPs Received` = Prog_Passes_Recieved, 
+         `KPs Recieved` = Key_Passes_Recieved, 
+         `Recieveing Suc` = receiving_Suc, 
+         `EPV Recieved` = EPV_Recieved, 
+         'EPV Created' = TeamEPV, 
+         '% of Team EPV' = Team_EPV_P)
+
+#data wrangling for detailed player stats table 2
+MatchSummaryPLayerTouchesSeasonDataP90 <- MatchSummaryPLayerTouchesSeasonDataP90 %>%
+  select(Team = TeamName, 
+         Name = playerId, 
+         Position = role, 
+         Mins = minutes_played, 
+         Touches, 
+         `Def 3rd` = Defensive_Third_Touches, 
+         `Mid 3rd` = Middle_Third_Touches, 
+         `Final 3rd` = Final_Third_Touches, 
+         `PK Box` = PK_Box_Touches, 
+         `Total / Min` = `T / Min`, 
+         `Def 3rd % TT` = `% T D Third`, 
+         `Mid Third % TT` = `% T M Third`, 
+         `Final 3rd % TT` = `% T F 3rd`, 
+         `PK Box % TT` = `% T PK Box`, 
+         `Carries` = Successful_Carries, 
+         `% Carries Prog` = `% P Carries`, 
+         `% Carries F 3rd` = `% F 3rd Carries`, 
+         `% Carries D Prog`)
+
+#data wrangling for detailed player stats table 3
+MatchSummaryPLayerShootingSeasonDataP90 <- MatchSummaryPLayerShootingSeasonDataP90 %>%
+    select(Team = TeamName, 
+           Position = role, 
+           Name = playerId, 
+           Mins = minutes_played, 
+           'Total Shots' = TotalShots, 
+           SoT, 
+           '6 yard box' = SixYard_Box_Shots,     
+           'PK Box Shot' = PK_Box_Shots, 
+           'Out Box Shots' = Out_Box_Shots, 
+           'Blocked Shot' = Blocked_Shot,
+           Goals, 
+           xG, 
+           xGOT,
+           'xG/Shot',
+           'Shot Accuracy',
+           'Shot Quality')
+
+#data wrangling for detailed player stats table 4
+MatchSummaryPLayerDefensiveSeasonDataP90 <- MatchSummaryPLayerDefensiveSeasonDataP90 %>%
+  select(Team = TeamName, 
+         Name = playerId, 
+         Position = role, 
+         Mins = minutes_played, 
+         'Aerials Total' = Aerial_total, 
+         'Aerials Won' = Aerial_Won, 
+         'Aerial Success %' = Aerial_Success, 
+         'Duels Total' = Ground_Duels_Total, 
+         'Duels Won' = Ground_Duels_Won, 
+         'Duel Success' = Duel_Success,         
+         'Tackles Total' = Tackles_Total, 
+         'Tackles Won' = Tackles_Won, 
+         'Tackles Lost' = Tackles_Lost, 
+         'Interceptions Total' = Interceptions_Total, 
+         'Recoverys Total' = Recoverys_Total,
+         'Clearances Total' = Clearances_Total, #c16
+         'Fouls Total' = Fouls_Total, 
+         'Fouls Conceeded' = Fouls_Conceeded, 
+         'Fouls Received' = Fouls_Received,
+         'Offside Won' = Offside_Won, 
+         'Offside Lost' = Offside_Lost,
+         'EPV Faced' =  EPV_Faced, 
+         'EPV Won'  = EPV_Won, 
+         'EPV Lost' = EPV_Lost,
+         'Possession Control' = Posession_Control)
 ```
 
 
 ## Row {.tabset}
-### Matchstats {.tabset}
+### Match Stats {.tabset}
 
 ```{r}
 #| title: Passing stats
@@ -6563,7 +6649,7 @@ MatchSummaryPLayerDefensiveTableHome <- MatchSummaryPLayerDefensiveData %>%
 MatchSummaryPLayerDefensiveTableHome
 ```
 
-### Seasonstats {.tabset}
+### Seasons Totals {.tabset}
 ```{r}
 #| title: Passing stats
 #| results: asis
@@ -6579,7 +6665,7 @@ SeasonSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingSeasonData %>%
                              )) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Home, " Player Match Possession Summary"),
+    title = paste0(Match_Home, " Player Season Possession Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   cols_hide(Team) %>%
@@ -6662,7 +6748,7 @@ SeasonSummaryPLayerTouchesTableHome <-
   tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
   tab_spanner(label = "Carries Breakdown", columns = c(15:18)) %>%
   tab_header(
-    title = paste0(Match_Home, " Player Match Touches Summary"),
+    title = paste0(Match_Home, " Player Season Touches Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:18), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -6718,7 +6804,7 @@ SeasonSummaryPLayerShootingTableHome <- MatchSummaryPLayerShootingSeasonData %>%
   fmt_number(columns = c(12:14), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Home, " Player Match Shooting Summary"),
+    title = paste0(Match_Home, " Player Season Shooting Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:16), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -6766,7 +6852,7 @@ SeasonSummaryPLayerDefensiveTableHome <- MatchSummaryPLayerDefensiveSeasonData %
   fmt_number(columns = c(22), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Home, " Player Match Defensive Summary"),
+    title = paste0(Match_Home, " Player Season Defensive Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:25), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -6806,8 +6892,253 @@ SeasonSummaryPLayerDefensiveTableHome <- MatchSummaryPLayerDefensiveSeasonData %
 
 SeasonSummaryPLayerDefensiveTableHome
 ```
+### Season P90 {.tabset}
+```{r}
+#| title: Passing stats
+#| results: asis
+#| label: Home player Passing table Season P90
+
+SeasonSummaryPLayerPassingTableHomeP90 <- MatchSummaryPLayerPassingSeasonDataP90 %>%
+  filter(Team == Match_Home) %>%
+  gt(groupname_col = "Position", rowname_col = "Name") %>%
+  row_group_order(groups = c("Keeper",
+                             "Defender",
+                             "Midfielder", 
+                             "Forward"
+                             )) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Home, " Player Season Possession P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  summary_rows(columns = c(5:24), fns = list(Average = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:24), fns = list(Total = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:24), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:24), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  fmt_percent(
+    columns = c(5, 10, 21, 24),
+    decimals = 0
+  ) %>%
+  fmt_number(
+    columns = c(6,7,22,23),
+    decimals = 2) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Home_Text), cell_fill(color = Color_Home)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_spanner(label = "Expected Metrics", columns = c(6:7)) %>%
+  tab_spanner(label = "Passes", columns = c(8:17)) %>%
+  tab_spanner(label = "receiving", columns = c(18:24)) %>%
+ tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_column_spanners('Expected Metrics'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('receiving'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  #gt_plt_bar(
+  #  'Long Ps',
+    #keep_column = TRUE,
+  #  labels = TRUE,
+  #  color = Color_Home,
+  #  scaled = FALSE,
+  #) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Home,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  #gt_color_rows(columns = c(6, 17, 28), palette = ColorScale_Home, domain = c(0,100)) %>%
+  gt_color_rows(columns = c(12:13, 16:17), palette = ColorScale_Home, domain = c(0,10)) %>%
+  #gt_color_rows(columns = c(10:12, 18:19, 20), palette = ColorScale_Home, domain = c(0,5)) %>%
+  #gt_color_rows(columns = c(5, 21, 22, 23, 24, 26), palette = ColorScale_Home, domain = c(0,20)) %>%
+  gt_color_rows(columns = c(5, 10, 21, 24), palette = ColorScale_Home, domain = c(0,1)) %>%
+  gt_color_rows(columns = c(14:15), palette = ColorScale_Home, domain = c(0,20))
+
+SeasonSummaryPLayerPassingTableHomeP90
+
+```
+```{r}
+#| title: Touches and Carries
+#| results: asis
+#| label: home player Touches table Season P90
+
+SeasonSummaryPLayerTouchesTableHomeP90 <- 
+  MatchSummaryPLayerTouchesSeasonDataP90 %>% 
+  filter(Team == Match_Home) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
+  fmt_number(columns = c(10), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
+  tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
+  tab_spanner(label = "Carries Breakdown", columns = c(15:18)) %>%
+  tab_header(
+    title = paste0(Match_Home, " Player Season Touches P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:18), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:18), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:18), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:18), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Home_Text), cell_fill(color = Color_Home)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_column_spanners("Touches (T) Breakdown"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('% Touches Thirds Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Carries Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Home,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(10), palette = ColorScale_Home, domain = c(0,3)) %>% # touch/per min
+  gt_color_rows(columns = c(12:14, 16:18), palette = ColorScale_Home, domain = c(0,1)) # % scales
+SeasonSummaryPLayerTouchesTableHomeP90
+
+```
+```{r}
+#| title: Shooting stats
+#| results: asis
+#| label: home player Shooting stats table Season P90
+
+SeasonSummaryPLayerShootingTableHomeP90 <- MatchSummaryPLayerShootingSeasonDataP90 %>% 
+  filter(Team == Match_Home) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(15:16), decimals = 0) %>%
+  fmt_number(columns = c(12:14), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Home, " Player Season Shooting P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:16), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:16), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:16), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:16), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Home_Text), cell_fill(color = Color_Home)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Home,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(5:11), palette = ColorScale_Home, domain = c(0,5)) %>% # shots
+  gt_color_rows(columns = c(15), palette = ColorScale_Home, domain = c(0,1)) %>%
+  gt_color_rows(columns = c(16), palette = ColorScale_Home, domain = c(-5, 5)) # % scales# % scales
+
+SeasonSummaryPLayerShootingTableHomeP90
+```
+
+```{r}
+#| title: Defensive stats
+#| results: asis
+#| label: home player Defensive stats table Season P90
+
+SeasonSummaryPLayerDefensiveTableHomeP90 <- MatchSummaryPLayerDefensiveSeasonDataP90 %>% 
+  filter(Team == Match_Home) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(7, 10, 23:24), decimals = 0) %>%
+  fmt_number(columns = c(22), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Home, " Player Season Defensive P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:25), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:25), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:25), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:25), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_spanner(label = "Duels Breakdown", columns = c(5:10)) %>%
+  tab_spanner(label = "Defensive Threat", columns = c(22:24)) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Home_Text), cell_fill(color = Color_Home)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_column_spanners('Duels Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_column_spanners('Defensive Threat'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Home,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(22), palette = ColorScale_Home, domain = c(0,2)) %>% # epv faced
+  gt_color_rows(columns = c(7, 10, 23, 24), palette = ColorScale_Home, domain = c(0,1)) # % scales
+
+SeasonSummaryPLayerDefensiveTableHomeP90
+```
+
 ## Row {.tabset}
-### MatchStats {.tabset}
+### Match Stats {.tabset}
 ```{r}
 #| title: Passing stats
 #| results: asis
@@ -7042,7 +7373,7 @@ MatchSummaryPLayerDefensiveTableAway <- MatchSummaryPLayerDefensiveData %>%
 MatchSummaryPLayerDefensiveTableAway
 
 ```
-### Seasonstats {.tabset}
+### Season Totals {.tabset}
 ```{r}
 #| title: Passing stats
 #| results: asis
@@ -7058,7 +7389,7 @@ SeasonSummaryPLayerPassingTableAway <- MatchSummaryPLayerPassingSeasonData %>%
                              )) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Away, " Player Match Possession Summary"),
+    title = paste0(Match_Away, " Player Season Possession Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   cols_hide(Team) %>%
@@ -7141,7 +7472,7 @@ SeasonSummaryPLayerTouchesTableAway <-
   tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
   tab_spanner(label = "Carries Breakdown", columns = c(15:18)) %>%
   tab_header(
-    title = paste0(Match_Away, " Player Match Touches Summary"),
+    title = paste0(Match_Away, " Player Season Touches Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:18), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -7197,7 +7528,7 @@ SeasonSummaryPLayerShootingTableAway <- MatchSummaryPLayerShootingSeasonData %>%
   fmt_number(columns = c(12:14), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Away, " Player Match Shooting Summary"),
+    title = paste0(Match_Away, " Player Season Shooting Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:16), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -7245,7 +7576,7 @@ SeasonSummaryPLayerDefensiveTableAway <- MatchSummaryPLayerDefensiveSeasonData %
   fmt_number(columns = c(22), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_header(
-    title = paste0(Match_Away, " Player Match Defensive Summary"),
+    title = paste0(Match_Away, " Player Season Defensive Totals"),
     subtitle = paste0("Up to - ", Match_Fixture)) %>%
   tab_source_note(md(My_caption)) %>%
   summary_rows(columns = c(5:25), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
@@ -7302,16 +7633,16 @@ Dribblesmapdata <- heatmapdata %>%
 
 #duels aerial and ground data
 Duelsmapdata <- heatmapdata
-  
+
 Duelsmapdata <- heatmapdata %>%
   filter(Ground_Duels_Total == 1 |
            Aerial_total == 1) %>%
   mutate(DuelsFinalX = ifelse(type == "TakeOn", lead(x), NA),
-         DuelsFinalY = ifelse(type == "TakeOn", lead(y), NA)) %>%
-  select(TeamName, teamId, playerId, player_shirt, playerNumber, role, x, y, DuelsFinalX, DuelsFinalY, outcome, Game_Period )
+         DuelsFinalY = ifelse(type == "TakeOn", lead(y), NA),
+         Duel_outcome = ifelse(Ground_Duels_Won == 1 | Aerial_Won == 1, "Successful", "UnSuccessful")) %>%
+  select(TeamName, teamId, playerId, player_shirt, playerNumber, role, x, y, DuelsFinalX, DuelsFinalY, outcome = Duel_outcome, Game_Period )
 
-
-#Liverpool duels data
+#Home duels data
 HomeDuelsmapdata <- Duelsmapdata %>%
   filter(TeamName == Match_Home)
 

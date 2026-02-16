@@ -5954,7 +5954,7 @@ MatchSummaryPLayerSeasonData <- SeasonData %>%
     Out_of_play_time = round(Out_of_play_time / 60, 1),
     EventTime = round(EventTime / 60, 1),
     TeamEPV = as.numeric(ifelse(str_detect(`outcomeType/value`, "1"), paste0(EPVvalue), 0))) %>%
-  group_by(TeamName, playerId, role, player_shirt) %>%
+  group_by(TeamName, playerId, role, game_name) %>%
     summarise(
     across(
       c(Goals, 
@@ -6021,17 +6021,17 @@ MatchSummaryPLayerSeasonData <- SeasonData %>%
         Recoverys_Total,
         Clearances_Total,
         Offside_Won, 
-        Offside_Lost
+        Offside_Lost,
+        Carries_distance,
+        Successful_Carries_Distance,
+        Prog_Carries_Distance
         ), 
       \(x) sum(x, na.rm = TRUE)
     ),
-    minutes_played = min(minutes_played, na.rm = TRUE),
-    Carries_distance = sum(Carries_distance, na.rm = TRUE),
-    Successful_Carries_Distance = sum(Successful_Carries_Distance, na.rm = TRUE),
-    Prog_Carries_Distance = sum(Prog_Carries_Distance, na.rm = TRUE)
-  ) %>%
+    minutes_played = min(minutes_played, na.rm = TRUE),) %>%
   ungroup() %>%
-  group_by(TeamName) %>%
+  group_by(TeamName, playerId, role) %>%
+  summarise(across(where(is.numeric), sum, na.rm = TRUE))
   mutate(
     Team_TotalTouches = sum(Touches),
     Team_TotalEPV = sum(TeamEPV),
