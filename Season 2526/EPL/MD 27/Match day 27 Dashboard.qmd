@@ -29,9 +29,9 @@ format:
 #| message: false
 
 library(tidyverse)
-library(shiny)
-library(gifski)
-library(magick)
+#library(shiny)
+#library(gifski)
+#library(magick)
 library(systemfonts)
 library(sysfonts)
 library(fontawesome)
@@ -39,11 +39,11 @@ library(glue)
 library(worldfootballR)
 library(gganimate)
 library(ggsoccer)
-library(paletteer)
+#library(paletteer)
 library(ggpointdensity)
 library(ggthemes)
 library(ggtext)
-library(ggiraph)
+#library(ggiraph)
 #library(ggiraphExtra)
 library(ggimage)
 library(gt)
@@ -51,13 +51,12 @@ library(gtExtras)
 library(grid)
 library(ggdensity)
 library(treemapify)
-library(magick)
 library(readxl)
 library(writexl)
-library(chromote)
+#library(chromote)
 library(ggrepel)
 library(png)
-library(patchwork)
+#library(patchwork)
 library(plotly)
 library(reshape)
 library(psych)
@@ -75,15 +74,13 @@ library(slider)
 library(rlang)
 
 ###############
-#set team information
-#set away
 Match_Away <- paste0("Liverpool")
 
 #Set Home
-Match_Home <- paste0("Sunderland")
+Match_Home <- paste0("Nottingham Forest")
 
 #set match date
-Game_date <- paste("11-02-2026")
+Game_date <- paste("22-02-2026")
 
 #set Game name
 GameName <- paste0(Match_Home," vs ", Match_Away)
@@ -96,17 +93,17 @@ DataBaseName <- paste0("EPLComp_LFC_Games_2526")
 
 ######################
 #set colours
-#set Away color
+#set Home color
 Color_Home <- paste("red")
 
-#set Away text
-Color_Home_Text <- paste("black")
+#set Home text
+Color_Home_Text <- paste("white")
 
-#set Home color
-Color_Away <- paste("#2E8B57")
+#set Away color
+Color_Away_Text <- paste("ivory")
 
-#set home text color
-Color_Away_Text <- paste("white")
+#set Away text color
+Color_Away <- paste("black")
 
 #####################
 #load fonts
@@ -140,8 +137,9 @@ GameWeek <- paste0("MD ",MatchDay)
 
 #set viz location for camcorder adn blue sky images
 Vizlocation <- paste0("~/Documents/Dropbox files/AI LFC data/R files/AI UP/Scripts/Viz Pack/Season 2526/EPL/", GameWeek)
+#####################################
 
-#set pk timte
+#set pk time
 PKTime <- 00
 
 #redcard (min before)
@@ -207,13 +205,13 @@ build_palette <- function(players,
   cols
 }
 
-ColorScale_HomeC <- build_palette(homeplayers, Color_Home, "white", "C")
+ColorScale_HomeC <- build_palette(homeplayers, Color_Home, "#FFFAFA", "C")
 
-ColorScale_Home <- build_palette(homeplayers, Color_Home,  "white", "D")
+ColorScale_Home <- build_palette(homeplayers, Color_Home,  "#FFFAFA", "D")
 
-ColorScale_AwayC <- build_palette(awayplayers, Color_Away,  "white", "C")
+ColorScale_AwayC <- build_palette(awayplayers, Color_Away,  "#FFFAFA", "C")
 
-ColorScale_Away <- build_palette(awayplayers, Color_Away,  "white", "D")
+ColorScale_Away <- build_palette(awayplayers, Color_Away,  "#FFFAFA", "D")
 
 ########################
 #set Waves titles
@@ -2677,7 +2675,7 @@ MatchSummarySeasonHalfsTable <- MatchSummarySeasonHalfData %>%
     locations = cells_column_spanners('Passes'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
     tab_style(
-    locations = cells_row_groups(groups = unique(MatchSummaryHalfData$Half)),
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonHalfData$Half)),
     style = cell_text(weight = "bold", size = 16, color = "white")
   ) %>%
     tab_style(
@@ -2742,7 +2740,7 @@ MatchSummarySeasonPeriodTable <- MatchSummarySeasonPeriodData %>%
     locations = cells_column_spanners('Passes'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
     tab_style(
-    locations = cells_row_groups(groups = unique(MatchSummaryPeriodData$Game_Period)),
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonPeriodData$Game_Period)),
     style = cell_text(weight = "bold", size = 16, color = "white")
   ) %>%
   tab_style(
@@ -2821,7 +2819,7 @@ MatchSummarySeasonGameStateTable <- MatchSummarySeasonGameStateData %>%
     )
   ) %>%
     tab_style(
-    locations = cells_row_groups(groups = unique(MatchSummaryGameStateData$Game_State)),
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonGameStateData$Game_State)),
     style = cell_text(weight = "bold", size = 16, color = "white")
   ) %>%
   
@@ -2878,15 +2876,15 @@ MatchSummaryGameNameData <- MatchSummaryGameNameData %>%
     locations = cells_column_spanners('Passes'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
   tab_style(
-    locations = cells_row_groups(groups = unique(MatchSummaryGameNameData$Match_day)),
+    locations = cells_row_groups(groups = as.character(unique(MatchSummaryGameNameData$Match_day))),
     style = cell_text(weight = "bold", size = 16, color = "white")
   ) %>%
   tab_style(
-    locations = cells_stub(rows = c(MatchSummaryGameNameData$Team == "All Oppo")),
+    locations = cells_stub(rows = Team == "All Oppo"),
     style = list(cell_fill(color = "black"),
                  cell_text(size = 16, weight = "bold", color = "white"))) %>%
   tab_style(
-    locations = cells_stub(rows = c(MatchSummaryGameNameData$Team == "Liverpool")),
+    locations = cells_stub(rows = Team == "Liverpool"),
     style = list(cell_fill(color = "red4"),
                 cell_text(size = 16,  weight = "bold", color = "white"))) %>%
   tab_style(
@@ -5060,7 +5058,7 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
   geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 1, color = "grey", show.legend = FALSE) +
   
   #  geom_path() +
-  geom_segment_interactive(
+  geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
                   length = unit(0.2, "cm")),
@@ -5114,7 +5112,7 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
   geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 1, color = "grey", show.legend = FALSE) +
   
   #  geom_path() +
-  geom_segment_interactive(
+  geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
@@ -5170,7 +5168,7 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
   geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 1, color = "grey", show.legend = FALSE) +
   
   #  geom_path() +
-  geom_segment_interactive(
+  geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
                   length = unit(0.2, "cm")),
@@ -5228,7 +5226,7 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
   geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 1, color = "grey", show.legend = FALSE) +
   
   #  geom_path() +
-  geom_segment_interactive(
+  geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
@@ -5285,8 +5283,7 @@ HomePRecievedHeatMapplot1Half <- plottingData %>%
   
   #geometrics
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
@@ -6286,8 +6283,12 @@ MatchSummaryPLayerDefensiveSeasonData <- MatchSummaryPLayerDefensiveSeasonData %
 
 MatchSummaryPLayerSeasonDataP90 <- MatchSummaryPLayerSeasonData %>%
   mutate(P90 = (minutes_played / 90),
-         across(7:122, ~ round(.x / P90, 2)))
-
+         across(7:120, ~ round(.x / P90, 2)),
+         Pass_Success = round((Successful_Passes / Attempted_Passes), 2),
+         Aerial_Success = (Aerial_Won / Aerial_total),
+         Duel_Success = (Ground_Duels_Won / Ground_Duels_Total),
+         receiving_Suc = (Successful_Recieved / Passes_Recieved),
+         across(c(Aerial_Success, Duel_Success, Pass_Success, receiving_Suc), ~ replace_na(.x, 0)))
 
 #subset for standard player stats data table 1
 MatchSummaryPLayerPassingSeasonDataP90 <- MatchSummaryPLayerSeasonDataP90
@@ -7631,7 +7632,7 @@ Dribblesmapdata <- heatmapdata %>%
 
 #duels aerial and ground data
 Duelsmapdata <- heatmapdata
-  
+
 Duelsmapdata <- heatmapdata %>%
   filter(Ground_Duels_Total == 1 |
            Aerial_total == 1) %>%
@@ -7640,8 +7641,7 @@ Duelsmapdata <- heatmapdata %>%
          Duel_outcome = ifelse(Ground_Duels_Won == 1 | Aerial_Won == 1, "Successful", "UnSuccessful")) %>%
   select(TeamName, teamId, playerId, player_shirt, playerNumber, role, x, y, DuelsFinalX, DuelsFinalY, outcome = Duel_outcome, Game_Period )
 
-
-#Liverpool duels data
+#Home duels data
 HomeDuelsmapdata <- Duelsmapdata %>%
   filter(TeamName == Match_Home)
 
@@ -7828,7 +7828,7 @@ HomeDribblesPlotT <- HomeDribblesmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   
   scale_size_continuous(range = c(0.5, 5)) +
@@ -7870,7 +7870,7 @@ HomeDulesPlotT <- HomeDuelsmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   
   scale_size_continuous(range = c(0.5, 5)) +
@@ -7915,7 +7915,7 @@ AwayDribblesPlotT <- AwayDribblesmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   
   scale_size_continuous(range = c(0.5, 5)) +
@@ -7957,7 +7957,7 @@ AwayDulesPlotT <- AwayDuelsmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   
   scale_size_continuous(range = c(0.5, 5)) +
@@ -8002,7 +8002,7 @@ HomeDribblesPlotP <- HomeDribblesmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   scale_size_continuous(range = c(0.5, 5)) +
   facet_wrap(~factor(role, levels = c("Keeper", "Defender", "Midfielder", "Forward")) + playerId, ncol = 5) +
@@ -8046,7 +8046,7 @@ HomeDulesPlotP <- HomeDuelsmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   scale_size_continuous(range = c(0.5, 5)) +
   facet_wrap(~factor(role, levels = c("Keeper", "Defender", "Midfielder", "Forward")) + playerId, ncol = 6) +
@@ -8088,7 +8088,7 @@ AwayDribblesPlotP <- AwayDribblesmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   scale_size_continuous(range = c(0.5, 5)) +
   facet_wrap(~factor(role, levels = c("Keeper", "Defender", "Midfielder", "Forward")) + playerId, ncol = 5) +
@@ -8130,7 +8130,7 @@ AwayDulesPlotP <- AwayDuelsmapdata %>%
   geom_point(aes(fill = outcome), shape = 21, size = 1.5, alpha = 0.6) +
   
   #formatting
-  scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
+  #scale_color_paletteer_c("ggthemes::Red-Black-White Diverging", -1) +
   scale_fill_manual(values = c("#0000FF",  "#BD1100")) +
   scale_size_continuous(range = c(0.5, 5)) +
   facet_wrap(~factor(role, levels = c("Keeper", "Defender", "Midfielder", "Forward")) + playerId, ncol = 6) +
@@ -11551,12 +11551,12 @@ Awayaverage_PPDANZ2H <- Awayaverage_PPDANZ2H %>%
 ### column {.tabset}
 ```{r}
 #| title: Home Defensive actions 1st Half
-#| label: Home  Defensive actions 1st Half
+#| label: Home Defensive actions 1st Half
 #| height: 100%
 
 HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
-  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  annotate_pitch(dimensions = pitch_opta, fill = "#E5E5E5", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
           annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
@@ -11567,7 +11567,8 @@ HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   geom_point(data = AwayAverage_Player1H, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(#color = after_stat(level), 
+    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   geom_text(data = average_PPDANZ1H, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
@@ -11577,7 +11578,7 @@ HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   
   #set scales
   scale_fill_gradientn(colors = ColorScale_HomeC) +
-  scale_color_gradientn(colors = ColorScale_HomeC) + 
+  scale_color_manual(values = ColorScale_Home) + 
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nFirst Half"), 
@@ -11595,8 +11596,6 @@ HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
 
 HomePPDAHeatMapplot1H
 
-#save Plot
-#ggsave(path = Vizlocation, "Home DA Heat map 1st half.png", width = 2500, height = 2150, units = "px", dpi = 400)
 
 ```
 
@@ -11628,7 +11627,8 @@ HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
   
   #set scales
   scale_fill_gradientn(colors = ColorScale_HomeC) +
-  scale_color_gradientn(colors = ColorScale_HomeC) + 
+  scale_color_manual(values = ColorScale_Home) + 
+
   
   #formatting
   labs(title = paste0(Match_Home," Open Play Defensive Actions Heat Map \nSecond Half"), 
@@ -11645,9 +11645,6 @@ HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
         legend.key = element_blank())
 
 HomePPDAHeatMapplot2H
-
-#save Plot
-#ggsave(path = Vizlocation, "Home DA Heat map 2nd half.png", width = 2500, height = 2150, units = "px", dpi = 400)
 
 ```
 
@@ -13546,7 +13543,7 @@ xGBubble_Plot_I
 #xGBubble_Plot
 ```
 
-```{r away bubble plot}
+```{r}
 #| label: away bubble plot
 
 AwayShotBubblexG_data <- plottingData 
