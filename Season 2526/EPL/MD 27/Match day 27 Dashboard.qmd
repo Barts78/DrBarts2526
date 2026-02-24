@@ -1961,12 +1961,44 @@ plottingData <- plottingData %>%
                                        ifelse(minute < 71 & minute > 50 & period == 2, "3rd Quarter",
                                               ifelse(minute < 100 & minute > 70 & period == 2, "4th Quarter", "Injury Time")))))
 
-#open play crosses
+#Defensive EPV
+DefEPVData <- plottingData %>%
+  filter(Corners == 0 ,
+         FreeKicks == 0 ,
+         Cross_Passes == 0, 
+         Short_Corners == 0,
+         Attempted_Carries == 1|
+         Attempted_Passes == 1|
+         Touches == 1|
+         Aerial_total == 1|
+         Ground_Duels_Total == 1|
+         `type/value` == 52|
+         !if_any(matches("^qualifiers/\\d+/type/value$"),
+            ~ coalesce(.x == 107, FALSE)))
+         
 
-#plottingData <- plottingData %>%
-#  mutate(Open_play_Crosses = as.integer(Cross_Passes == 1 & Corners == 0),
-#         Successful_Open_play_Crosses = as.integer(Open_play_Crosses == 1 & `outcomeType/value` == 1),
-#                  UnSuccessful_Open_play_Crosses = as.integer(Open_play_Crosses == 1 & `outcomeType/value` == 0))
+DefEPVData <- shift_column(data = DefEPVData, columns = "EPVvalue", new_names = "EPV_Def", len = 1, up = TRUE)
+
+DefEPVData <- DefEPVData %>%
+  filter(Defensive_Action == 1) %>%
+  select(id, TeamName, EPVvalue, EPV_Def, `outcomeType/value`) %>%
+  mutate(EPV_Faced = (EPVvalue + EPV_Def),
+    Successful_Def_EPV = ifelse(`outcomeType/value` == 1, paste0(EPV_Faced), 0),
+         Unsuccessful_Def_EPV = ifelse(`outcomeType/value` == 0, paste0(EPV_Faced), 0), 
+         Successful_Def_EPV = as.numeric(Successful_Def_EPV),
+         Unsuccessful_Def_EPV = as.numeric(Unsuccessful_Def_EPV),
+    Won_Def_EPV = as.integer(`outcomeType/value` == 1),
+    Lost_Def_EPV = as.integer(`outcomeType/value` == 0))
+
+DefEPVData <- DefEPVData %>% 
+  select(-`outcomeType/value`, -EPVvalue)
+
+plottingData <- plottingData %>%
+  left_join(DefEPVData, by = c('id' = 'id', 'TeamName' = 'TeamName'), copy = TRUE)
+
+
+plottingData <- plottingData %>%
+    replace_na(list(EPV_Def = 0, EPV_Faced = 0, Successful_Def_EPV = 0, Unsuccessful_Def_EPV = 0, Won_Def_EPV = 0, Lost_Def_EPV = 0)) 
 
 ```
 
@@ -5676,7 +5708,6 @@ MD_adv_passing <- MD_adv_passing %>%
   select(Team = Receiver_Team, Shirt = Receiver_shirt, Passes_Recieved, Successful_Recieved, Key_Passes_Recieved, Prog_Passes_Recieved, EPV_Recieved = EPV, receiving_Suc)
 
 #data load check for data to be converted to number
-#MatchdayTablePass <- MD_passing_values #xt xa from fbref
 MatchdayTableAdvPass <- MD_adv_passing
 
 # add all data together
@@ -5709,51 +5740,11 @@ MatchSummaryPLayerData <- MatchSummaryPLayerData %>%
          Posession_Control = (Interceptions_Total + Recoverys_Total + (Tackles_Won - Tackles_Lost) + (Aerial_Won - Aerial_Lost) - (Mis_Control + Dispossessed_Total + UnSuccessful_Passes + UnSuccessful_Cross + Dribbles_Lost  + OFShots + Blocked_Shot + Offside_Lost)),) %>%
   mutate_all(~ ifelse(is.na(.), 0, .))
 
-DefEPVData <- plottingData %>%
-  filter(Corners == 0,
-         Short_Corners == 0,
-         FreeKicks == 0,
-         !`qualifiers/0/type/value` == 107, #throw in
-         !`qualifiers/1/type/value` == 107,
-         !`qualifiers/2/type/value` == 107,
-         !`qualifiers/3/type/value` == 107,
-           `type/value` == 1 |
-           `type/value` == 2 | 
-           `type/value` == 3 |
-           `type/value` == 4 |
-           `type/value` == 9 |
-           `type/value` == 7 |
-           `type/value` == 8 |
-           `type/value` == 10 |
-           `type/value` == 11 |
-           `type/value` == 12 |
-           `type/value` == 13 |
-           `type/value` == 14 |
-           `type/value` == 15 |
-           `type/value` == 16 |
-           `type/value` == 41 |
-           `type/value` == 44 |
-           `type/value` == 42 |
-           `type/value` == 45 |
-           `type/value` == 50 |
-           `type/value` == 52 |
-           `type/value` == 54 |
-           `type/value` == 61 |
-           `type/value` == 73 |
-           `type/value` == 74) 
+PlayerDefEPVData <- plottingData %>%
+  #filter(Defensive_Action == 1) %>%
+  select(TeamName, playerId, EPVvalue, Defensive_Action, `outcomeType/value`, EPV_Def, role, EPV_Faced, Unsuccessful_Def_EPV, Successful_Def_EPV) 
 
-DefEPVData <- shift_column(data = DefEPVData, columns = "EPVvalue", new_names = "EPV_Def", len = 1, up = TRUE)
-
-DefEPVData <- DefEPVData %>%
-  filter(Defensive_Action == 1) %>%
-  select(TeamName, playerId, EPVvalue, Defensive_Action, `outcomeType/value`, EPV_Def, role) %>%
-  mutate(EPV_Faced = (EPVvalue + EPV_Def),
-    Successful_Def_EPV = ifelse(`outcomeType/value` == 1, paste0(EPV_Faced), 0),
-         Unsuccessful_Def_EPV = ifelse(`outcomeType/value` == 0, paste0(EPV_Faced), 0), 
-         Successful_Def_EPV = as.numeric(Successful_Def_EPV),
-         Unsuccessful_Def_EPV = as.numeric(Unsuccessful_Def_EPV))
-
-DefEPVData <- DefEPVData %>%
+PlayerDefEPVData <- PlayerDefEPVData %>%
     group_by(playerId, role, TeamName) %>% 
   summarise(EPV_Faced = sum(EPV_Faced),
             EPV_Won = sum(Successful_Def_EPV/EPV_Faced), 
@@ -5761,12 +5752,7 @@ DefEPVData <- DefEPVData %>%
     mutate_all(~ifelse(is.nan(.), 0, .)) 
 
 MatchSummaryPLayerData <- MatchSummaryPLayerData %>%
-  left_join(DefEPVData, by = c('playerId' = 'playerId', 'TeamName' = 'TeamName', 'role' = 'role'), copy = TRUE)
-
-
-MatchSummaryPLayerData <- MatchSummaryPLayerData %>%
-    replace_na(list( EPV_Faced = 0, EPV_Won = 0, EPV_Lost = 0)) 
-
+  left_join(PlayerDefEPVData, by = c('playerId' = 'playerId', 'TeamName' = 'TeamName', 'role' = 'role'), copy = TRUE)
 
 #subset for standard player stats data table 1
 MatchSummaryPLayerPassingData <- MatchSummaryPLayerData
@@ -7614,6 +7600,250 @@ SeasonSummaryPLayerDefensiveTableAway <- MatchSummaryPLayerDefensiveSeasonData %
   gt_color_rows(columns = c(7, 10, 23, 24), palette = ColorScale_Away, domain = c(0,1)) # % scales
 
 SeasonSummaryPLayerDefensiveTableAway
+```
+### Season P90 {.tabset}
+```{r}
+#| title: Passing stats
+#| results: asis
+#| label: Away player Passing table Season P90
+
+SeasonSummaryPLayerPassingTableAwayP90 <- MatchSummaryPLayerPassingSeasonDataP90 %>%
+  filter(Team == Match_Away) %>%
+  gt(groupname_col = "Position", rowname_col = "Name") %>%
+  row_group_order(groups = c("Keeper",
+                             "Defender",
+                             "Midfielder", 
+                             "Forward"
+                             )) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Away, " Player Season Possession P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  summary_rows(columns = c(5:24), fns = list(Average = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:24), fns = list(Total = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:24), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:24), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  fmt_percent(
+    columns = c(5, 10, 21, 24),
+    decimals = 0
+  ) %>%
+  fmt_number(
+    columns = c(6,7,22,23),
+    decimals = 2) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Away_Text), cell_fill(color = Color_Away)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_spanner(label = "Expected Metrics", columns = c(6:7)) %>%
+  tab_spanner(label = "Passes", columns = c(8:17)) %>%
+  tab_spanner(label = "receiving", columns = c(18:24)) %>%
+ tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_column_spanners('Expected Metrics'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('receiving'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  #gt_plt_bar(
+  #  'Long Ps',
+    #keep_column = TRUE,
+  #  labels = TRUE,
+  #  color = Color_Away,
+  #  scaled = FALSE,
+  #) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Away,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  #gt_color_rows(columns = c(6, 17, 28), palette = ColorScale_Away, domain = c(0,100)) %>%
+  gt_color_rows(columns = c(12:13, 16:17), palette = ColorScale_Away, domain = c(0,10)) %>%
+  #gt_color_rows(columns = c(10:12, 18:19, 20), palette = ColorScale_Away, domain = c(0,5)) %>%
+  #gt_color_rows(columns = c(5, 21, 22, 23, 24, 26), palette = ColorScale_Away, domain = c(0,20)) %>%
+  gt_color_rows(columns = c(5, 10, 21, 24), palette = ColorScale_Away, domain = c(0,1)) %>%
+  gt_color_rows(columns = c(14:15), palette = ColorScale_Away, domain = c(0,20))
+
+SeasonSummaryPLayerPassingTableAwayP90
+
+```
+```{r}
+#| title: Touches and Carries
+#| results: asis
+#| label: Away player Touches table Season P90
+
+SeasonSummaryPLayerTouchesTableAwayP90 <- 
+  MatchSummaryPLayerTouchesSeasonDataP90 %>% 
+  filter(Team == Match_Away) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
+  fmt_number(columns = c(10), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
+  tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
+  tab_spanner(label = "Carries Breakdown", columns = c(15:18)) %>%
+  tab_header(
+    title = paste0(Match_Away, " Player Season Touches P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:18), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:18), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:18), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:18), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Away_Text), cell_fill(color = Color_Away)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_column_spanners("Touches (T) Breakdown"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('% Touches Thirds Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Carries Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Away,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(10), palette = ColorScale_Away, domain = c(0,3)) %>% # touch/per min
+  gt_color_rows(columns = c(12:14, 16:18), palette = ColorScale_Away, domain = c(0,1)) # % scales
+SeasonSummaryPLayerTouchesTableAwayP90
+
+```
+```{r}
+#| title: Shooting stats
+#| results: asis
+#| label: Away player Shooting stats table Season P90
+
+SeasonSummaryPLayerShootingTableAwayP90 <- MatchSummaryPLayerShootingSeasonDataP90 %>% 
+  filter(Team == Match_Away) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(15:16), decimals = 0) %>%
+  fmt_number(columns = c(12:14), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Away, " Player Season Shooting P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:16), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:16), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:16), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:16), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Away_Text), cell_fill(color = Color_Away)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Away,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(5:11), palette = ColorScale_Away, domain = c(0,5)) %>% # shots
+  gt_color_rows(columns = c(15), palette = ColorScale_Away, domain = c(0,1)) %>%
+  gt_color_rows(columns = c(16), palette = ColorScale_Away, domain = c(-5, 5)) # % scales# % scales
+
+SeasonSummaryPLayerShootingTableAwayP90
+```
+
+```{r}
+#| title: Defensive stats
+#| results: asis
+#| label: Away player Defensive stats table Season P90
+
+SeasonSummaryPLayerDefensiveTableAwayP90 <- MatchSummaryPLayerDefensiveSeasonDataP90 %>% 
+  filter(Team == Match_Away) %>%
+  gt(rowname_col = "Name", groupname_col = "Position") %>%
+  row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
+  cols_hide(Team) %>%
+  cols_width(Name ~ px(100)) %>%
+  fmt_percent(columns = c(7, 10, 23:24), decimals = 0) %>%
+  fmt_number(columns = c(22), decimals = 2) %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = paste0(Match_Away, " Player Season Defensive P90"),
+    subtitle = paste0("Up to - ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  summary_rows(columns = c(5:25), fns = list("Pos Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  summary_rows(columns = c(5:25), fns = list("Pos Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  grand_summary_rows(columns = c(5:25), fns = list("Team Average" = ~ mean (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 1))) %>%
+  grand_summary_rows(columns = c(5:25), fns = list("Team Total" = ~ sum (., na.rm=TRUE)), fmt = list(~fmt_number(., decimals = 0))) %>%
+  tab_spanner(label = "Duels Breakdown", columns = c(5:10)) %>%
+  tab_spanner(label = "Defensive Threat", columns = c(22:24)) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = Color_Away_Text), cell_fill(color = Color_Away)),
+    locations = cells_row_groups(groups = everything())) %>%
+  tab_style(
+    locations = cells_column_spanners('Duels Breakdown'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_column_spanners('Defensive Threat'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = Color_Away,
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
+  gt_color_rows(columns = c(22), palette = ColorScale_Away, domain = c(0,2)) %>% # epv faced
+  gt_color_rows(columns = c(7, 10, 23, 24), palette = ColorScale_Away, domain = c(0,1)) # % scales
+
+SeasonSummaryPLayerDefensiveTableAwayP90
 ```
 
 ## Row
@@ -10661,6 +10891,428 @@ EPVCarrieEventsBottom5TableAway <- EPVCarrieEvents %>%
   tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) 
 
 EPVCarrieEventsBottom5TableAway
+```
+## Row {.flow}
+
+```{r}  
+#| output: false
+#| label: Home Def EPV Setup
+#| warning: false
+DefEPVHeatMapData <- plottingData %>%
+  filter(TeamName == Match_Home) %>%
+  select(TeamName, player_shirt, playerId, x, y, period, EPV_Faced, 
+         Successful_Def_EPV, Unsuccessful_Def_EPV, Won_Def_EPV, Lost_Def_EPV) 
+
+
+#set time period
+DefEPVHeatMapDataFTS <- DefEPVHeatMapData %>%
+  filter(Won_Def_EPV == 1)
+
+# Calculate average player position
+      Average_PlayerFTS <- DefEPVHeatMapDataFTS %>% 
+        group_by(playerId, player_shirt) %>% 
+        summarise(x = mean(x, na.rm = TRUE), y = mean(y, na.rm = TRUE), events = n()) %>% 
+        na.omit() %>%
+        mutate(x = (100 - x),
+               y = (100 - y))
+
+#set EPV total for time period
+HomeDefEPVFTS <- sum(DefEPVHeatMapDataFTS$EPV_Faced)
+
+# Create a new variable to represent the zone for each observation
+DefEPVHeatMapDataFTS$zone_x <- cut(DefEPVHeatMapDataFTS$x, breaks = c(0, 17, 33.2, 50, 66.4, 83, 100), include.lowest = TRUE)
+DefEPVHeatMapDataFTS$zone_y <- cut(DefEPVHeatMapDataFTS$y, breaks = c(0, 21.1, 36.8, 63.2, 78.9, 100), include.lowest = TRUE)
+
+# Calculate average EPV for each zone
+average_DefepvFTS <- DefEPVHeatMapDataFTS %>%
+  group_by(zone_x, zone_y) %>%
+  summarize(avg_epv = sum(Successful_Def_EPV, na.rm = TRUE)) %>%
+  mutate(avg_epv = round(ifelse(avg_epv < 0, abs(avg_epv), avg_epv), 3),
+         PEPV = round(avg_epv/HomeDefEPVFTS,3)) 
+
+#calculate for combined tile and heat map
+average_DefepvNZFTS <- average_DefepvFTS %>%
+  mutate(x = ifelse(zone_x == "[0,17]", 8.5,
+                    ifelse(zone_x == "(17,33.2]", 25.1,
+                           ifelse(zone_x == "(33.2,50]", 41.6,
+                                  ifelse(zone_x == "(50,66.4]", 58.2,
+                                         ifelse(zone_x == "(66.4,83]", 74.7,
+                                                ifelse(zone_x == "(83,100]", 91.5, NA))))))) %>%
+  mutate(y = ifelse(zone_y == "[0,21.1]", 10,
+                    ifelse(zone_y == "(21.1,36.8]", 30,
+                           ifelse(zone_y == "(36.8,63.2]", 50,
+                                  ifelse(zone_y == "(63.2,78.9]", 70,
+                                         ifelse(zone_y == "(78.9,100]", 90, NA))))))
+
+average_DefepvNZFTS <- average_DefepvNZFTS %>%
+  group_by(x, y) %>%
+  summarise(avg_epv = sum(avg_epv, na.rm = TRUE)) %>%
+  mutate(PEPV = 100*(round(avg_epv/HomeDefEPVFTS,2)))  
+
+
+```
+
+```{r}
+#Away Def EPV heat plots
+#| output: false
+AwayDefEPVHeatMapData <- plottingData %>%
+  filter(TeamName == Match_Away) %>%
+  select(TeamName, player_shirt, playerId, x, y, period, EPV_Faced, 
+         Successful_Def_EPV, Unsuccessful_Def_EPV, Won_Def_EPV, Lost_Def_EPV) 
+
+
+#set for time period
+AwayDefEPVHeatMapDataFTS <- AwayDefEPVHeatMapData %>%
+  filter(Won_Def_EPV == 1)
+
+# Calculate average player position
+      AwayAverage_PlayerFTS <- AwayDefEPVHeatMapDataFTS %>% 
+        group_by(playerId, player_shirt) %>% 
+        summarise(x = mean(x, na.rm = TRUE), y = mean(y, na.rm = TRUE), events = n()) %>% 
+        na.omit() %>%
+        mutate(x = (100 - x),
+               y = (100 - y))
+
+#set EPV total for time period
+AwayDefEPVFTS <- sum(AwayDefEPVHeatMapDataFTS$EPV_Faced)
+
+
+# Create a new variable to represent the zone for each observation
+AwayDefEPVHeatMapDataFTS$zone_x <- cut(AwayDefEPVHeatMapDataFTS$x, breaks = c(0, 17, 33.2, 50, 66.4, 83, 100), include.lowest = TRUE)
+AwayDefEPVHeatMapDataFTS$zone_y <- cut(AwayDefEPVHeatMapDataFTS$y, breaks = c(0, 21.1, 36.8, 63.2, 78.9, 100), include.lowest = TRUE)
+
+# Calculate average EPV for each zone
+Awayaverage_DefepvFTS <- AwayDefEPVHeatMapDataFTS %>%
+  group_by(zone_x, zone_y) %>%
+  summarize(avg_epv = sum(Successful_Def_EPV, na.rm = TRUE)) %>%
+  mutate(avg_epv = round(ifelse(avg_epv < 0, abs(avg_epv), avg_epv), 3),
+         PEPV = round(avg_epv/AwayDefEPVFTS,3)) 
+
+#calculate for combined tile and heat map
+Awayaverage_DefepvNZFTS <- Awayaverage_DefepvFTS %>%
+  mutate(x = ifelse(zone_x == "[0,17]", 8.5,
+                    ifelse(zone_x == "(17,33.2]", 25.1,
+                           ifelse(zone_x == "(33.2,50]", 41.6,
+                                  ifelse(zone_x == "(50,66.4]", 58.2,
+                                         ifelse(zone_x == "(66.4,83]", 74.7,
+                                                ifelse(zone_x == "(83,100]", 91.5, NA))))))) %>%
+  mutate(y = ifelse(zone_y == "[0,21.1]", 10,
+                    ifelse(zone_y == "(21.1,36.8]", 30,
+                           ifelse(zone_y == "(36.8,63.2]", 50,
+                                  ifelse(zone_y == "(63.2,78.9]", 70,
+                                         ifelse(zone_y == "(78.9,100]", 90, NA))))))
+
+Awayaverage_DefepvNZFTS <- Awayaverage_DefepvNZFTS %>%
+  group_by(x, y) %>%
+  summarise(avg_epv = sum(avg_epv, na.rm = TRUE)) %>%
+  mutate(PEPV = 100*(round(avg_epv/AwayDefEPVFTS,2)))  
+
+```
+
+```{r}  
+#| output: false
+#| label: Home Def EP Setup Unsuccessful
+#| warning: false
+DefEPVHeatMapData <- plottingData %>%
+  filter(TeamName == Match_Home) %>%
+  select(TeamName, player_shirt, playerId, x, y, period, EPV_Faced, 
+         Successful_Def_EPV, Unsuccessful_Def_EPV, Won_Def_EPV, Lost_Def_EPV)  
+
+
+#set time period
+DefEPVHeatMapDataFTU <- DefEPVHeatMapData %>%
+  filter(Lost_Def_EPV == 1)
+
+# Calculate average player position
+      Average_PlayerFTU <- DefEPVHeatMapDataFTU %>% 
+        group_by(playerId, player_shirt) %>% 
+        summarise(x = mean(x, na.rm = TRUE), y = mean(y, na.rm = TRUE), events = n()) %>% 
+        na.omit() %>%
+        mutate(x = (100 - x),
+               y = (100 - y))
+
+#set EPV total for time period
+HomeDefEPVFTU <- sum(DefEPVHeatMapDataFTU$EPV_Faced)
+
+# Create a new variable to represent the zone for each observation
+DefEPVHeatMapDataFTU$zone_x <- cut(DefEPVHeatMapDataFTU$x, breaks = c(0, 17, 33.2, 50, 66.4, 83, 100), include.lowest = TRUE)
+DefEPVHeatMapDataFTU$zone_y <- cut(DefEPVHeatMapDataFTU$y, breaks = c(0, 21.1, 36.8, 63.2, 78.9, 100), include.lowest = TRUE)
+
+# Calculate average EPV for each zone
+average_DefepvFTU <- DefEPVHeatMapDataFTU %>%
+  group_by(zone_x, zone_y) %>%
+  summarize(avg_epv = sum(Unsuccessful_Def_EPV, na.rm = TRUE)) %>%
+  mutate(avg_epv = round(ifelse(avg_epv < 0, abs(avg_epv), avg_epv), 3),
+         PEPV = round(avg_epv/HomeDefEPVFTU,3)) 
+
+#calculate for combined tile and heat map
+average_DefepvNZFTU <- average_DefepvFTU %>%
+  mutate(x = ifelse(zone_x == "[0,17]", 8.5,
+                    ifelse(zone_x == "(17,33.2]", 25.1,
+                           ifelse(zone_x == "(33.2,50]", 41.6,
+                                  ifelse(zone_x == "(50,66.4]", 58.2,
+                                         ifelse(zone_x == "(66.4,83]", 74.7,
+                                                ifelse(zone_x == "(83,100]", 91.5, NA))))))) %>%
+  mutate(y = ifelse(zone_y == "[0,21.1]", 10,
+                    ifelse(zone_y == "(21.1,36.8]", 30,
+                           ifelse(zone_y == "(36.8,63.2]", 50,
+                                  ifelse(zone_y == "(63.2,78.9]", 70,
+                                         ifelse(zone_y == "(78.9,100]", 90, NA))))))
+
+average_DefepvNZFTU <- average_DefepvNZFTU %>%
+  group_by(x, y) %>%
+  summarise(avg_epv = sum(avg_epv, na.rm = TRUE)) %>%
+  mutate(PEPV = 100*(round(avg_epv/HomeDefEPVFTU,2)))  
+
+
+```
+
+```{r}
+#Away Def EPV heat plots
+#| output: false
+#| label: Away Def EP Setup Unsuccessful
+#| warning: false
+AwayDefEPVHeatMapData <- plottingData %>%
+  filter(TeamName == Match_Away) %>%
+  select(TeamName, player_shirt, playerId, x, y, period, EPV_Faced, 
+         Successful_Def_EPV, Unsuccessful_Def_EPV, Won_Def_EPV, Lost_Def_EPV) 
+
+
+#set for time period
+AwayDefEPVHeatMapDataFTU <- AwayDefEPVHeatMapData %>%
+  filter(Lost_Def_EPV == 1)
+
+# Calculate average player position
+      AwayAverage_PlayerFTU <- AwayDefEPVHeatMapDataFTU %>% 
+        group_by(playerId, player_shirt) %>% 
+        summarise(x = mean(x, na.rm = TRUE), y = mean(y, na.rm = TRUE), events = n()) %>% 
+        na.omit() %>%
+        mutate(x = (100 - x),
+               y = (100 - y))
+
+#set EPV total for time period
+AwayDefEPVFTU <- sum(AwayDefEPVHeatMapDataFTU$EPV_Faced)
+
+
+# Create a new variable to represent the zone for each observation
+AwayDefEPVHeatMapDataFTU$zone_x <- cut(AwayDefEPVHeatMapDataFTU$x, breaks = c(0, 17, 33.2, 50, 66.4, 83, 100), include.lowest = TRUE)
+AwayDefEPVHeatMapDataFTU$zone_y <- cut(AwayDefEPVHeatMapDataFTU$y, breaks = c(0, 21.1, 36.8, 63.2, 78.9, 100), include.lowest = TRUE)
+
+# Calculate average EPV for each zone
+Awayaverage_DefepvFTU <- AwayDefEPVHeatMapDataFTU %>%
+  group_by(zone_x, zone_y) %>%
+  summarize(avg_epv = sum(Unsuccessful_Def_EPV, na.rm = TRUE)) %>%
+  mutate(avg_epv = round(ifelse(avg_epv < 0, abs(avg_epv), avg_epv), 3),
+         PEPV = round(avg_epv/AwayDefEPVFTU,3)) 
+
+#calculate for combined tile and heat map
+Awayaverage_DefepvNZFTU <- Awayaverage_DefepvFTU %>%
+  mutate(x = ifelse(zone_x == "[0,17]", 8.5,
+                    ifelse(zone_x == "(17,33.2]", 25.1,
+                           ifelse(zone_x == "(33.2,50]", 41.6,
+                                  ifelse(zone_x == "(50,66.4]", 58.2,
+                                         ifelse(zone_x == "(66.4,83]", 74.7,
+                                                ifelse(zone_x == "(83,100]", 91.5, NA))))))) %>%
+  mutate(y = ifelse(zone_y == "[0,21.1]", 10,
+                    ifelse(zone_y == "(21.1,36.8]", 30,
+                           ifelse(zone_y == "(36.8,63.2]", 50,
+                                  ifelse(zone_y == "(63.2,78.9]", 70,
+                                         ifelse(zone_y == "(78.9,100]", 90, NA))))))
+
+Awayaverage_DefepvNZFTU <- Awayaverage_DefepvNZFTU %>%
+  group_by(x, y) %>%
+  summarise(avg_epv = sum(avg_epv, na.rm = TRUE)) %>%
+  mutate(PEPV = 100*(round(avg_epv/AwayDefEPVFTU,2)))  
+
+```
+
+### Column {.tabset}
+```{r}
+#| height: 100%
+#| label: Home Successful EPV Heat Map FT
+#| title: Home Successful EPV Heat Map FT
+DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  
+  #geometrics
+  #plot player positions
+  geom_point(data = AwayAverage_PlayerFTS, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot heat map
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+
+  # add zone percentage numbers
+  geom_text(data = average_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+    
+  #plot player names
+  geom_text(data = AwayAverage_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
+  
+    #set scales
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
+
+  #formatting
+  labs(title = paste0(Match_Home," Successful Defensive EPV Heat Map \nFull Game - Open Play"), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced, Box figures = % of Total Defensive EPV \nDirection of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 12),
+        legend.position = "none", 
+        legend.direction = "horizontal", 
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
+
+DefEPVHeatMapplotFTS
+```
+
+```{r}
+#| height: 100%
+#| label: Home Unsuccessful EPV Heat Map FT
+#| title: Home Unsuccessful EPV Heat Map FT
+DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  
+  #geometrics
+  #plot player positions
+  geom_point(data = AwayAverage_PlayerFTU, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot heat map
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+
+  # add zone percentage numbers
+  geom_text(data = average_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+    
+  #plot player names
+  geom_text(data = AwayAverage_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
+  
+    #set scales
+   scale_fill_gradientn(colors = ColorScale_HomeC) +
+   scale_color_gradientn(colors = ColorScale_HomeC) +
+
+  #formatting
+  labs(title = paste0(Match_Home," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play"), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced, Box figures = % of Total Defensive EPV \nDirection of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 12),
+        legend.position = "none", 
+        legend.direction = "horizontal", 
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
+
+DefEPVHeatMapplotFTU
+```
+### Column {.tabset}
+```{r}
+#| height: 100%
+#| label: Away Successful EPV Heat Map FT
+#| title: Away Successful EPV Heat Map FT
+AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+
+  #geometrics
+  #plot player positions
+  geom_point(data = Average_PlayerFTS, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot heat map
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  
+  # add zone percentage numbers
+  geom_text(data = Awayaverage_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+  
+  #plot player names
+  geom_text(data = Average_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
+  #set colors
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
+  
+  #formatting
+  labs(title = paste(Match_Away," Successful Defensive EPV Heat Map \nFull Game - Open Play "), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher, EPV, Box figures = % of Total EPV \nDirection of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 12),
+        legend.position = "none", 
+        legend.background = element_blank(), 
+        legend.key = element_blank())
+
+AwayDefEPVHeatMapplotFTS
+
+```
+
+```{r}
+#| height: 100%
+#| label: Away Unsuccessful EPV Heat Map FT
+#| title: Away Unsuccessful EPV Heat Map FT
+AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+
+  #geometrics
+  #plot player positions
+  geom_point(data = Average_PlayerFTU, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot heat map
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  
+  # add zone percentage numbers
+  geom_text(data = Awayaverage_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+  
+  #plot player names
+  geom_text(data = Average_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
+  #set colors
+  scale_fill_gradientn(colors = ColorScale_AwayC) +
+  scale_color_gradientn(colors = ColorScale_AwayC) +
+  
+  #formatting
+  labs(title = paste(Match_Away," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play "), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher, EPV, Box figures = % of Total EPV \nDirection of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 12),
+        legend.position = "none", 
+        legend.background = element_blank(), 
+        legend.key = element_blank())
+
+AwayDefEPVHeatMapplotFTU
+
 ```
 
 # Off Ball Analysis
