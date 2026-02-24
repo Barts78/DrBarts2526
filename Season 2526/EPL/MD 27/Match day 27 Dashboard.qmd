@@ -681,7 +681,7 @@ TouchPlayerPlot_AI <- function(
   title = "",
   subtitle = "",
   plot_start = 0,
-  plot_finish = 45,
+  plot_finish = 110,
   logo = "",
   method = "quantile",  # or "mad"
   facet_by = "playerId"
@@ -7912,8 +7912,10 @@ AwayTeamTouchData <- TouchData %>%
 ```
 
 ## Row  {.flow}
+### column {.tabset}
 ```{r}
-#| label: home player touch plot
+#| label: home player touch plot 1st Subs
+#| title: Home player touch plot 1st Subs
 #| height: 100%
 #| message: false
 
@@ -7921,14 +7923,41 @@ HomeconvexPlot1stsubs <- TouchPlayerPlot_AI(TouchDataHome,  title = Match_Home,
                                     plot_start = 00, plot_finish = firstSubHome, color = Color_Home, text_color = Color_Home_Text, method = "mad",
                                     subtitle = paste0(Match_Fixture, " Up to 1st subs"))
 HomeconvexPlot1stsubs
+```
+```{r}
+#| label: home player touch plot 1st Half
+#| title: Home player touch plot 1st Half
+#| height: 100%
+#| message: false
 
+TouchDataHome1 <- TouchDataHome %>%
+  filter(period == 1)
 
+HomeconvexPlot1sthalf <- TouchPlayerPlot_AI(TouchDataHome1,  title = Match_Home,
+                                    plot_start = 00, plot_finish = , color = Color_Home, text_color = Color_Home_Text, method = "mad",
+                                    subtitle = paste0(Match_Fixture, " 1st Half"))
+HomeconvexPlot1sthalf
+```
+
+```{r}
+#| label: home player touch plot 2nd Half
+#| title: Home player touch plot 2nd Half
+#| height: 100%
+#| message: false
+
+TouchDataHome2 <- TouchDataHome %>%
+  filter(period == 2)
+
+HomeconvexPlot2ndhalf <- TouchPlayerPlot_AI(TouchDataHome2,  title = Match_Home,
+                                    plot_start = 00, plot_finish = , color = Color_Home, text_color = Color_Home_Text, method = "mad",
+                                    subtitle = paste0(Match_Fixture, " 2nd Half"))
+HomeconvexPlot2ndhalf
 ```
 
 ### column {.tabset}
 ```{r}
 #| title: On ball touch plot 1st subs
-#| label: home team touch plot 1st subs
+#| label: Home team touch plot 1st subs
 #| height: 100%
 #| message: false
 
@@ -7949,7 +7978,7 @@ HometouchPlot1Sub
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomeTeamTouchData,  title = paste0(Match_Home, " Team On Ball Touch"),
                                      plot_start = 00, plot_finish = 45, color = Color_Home, logo = "", method = "mad",
-                                     subtitle = paste0(Match_Fixture, " Up to 1st Sub"))
+                                     subtitle = paste0(Match_Fixture, " Up to 1st Half"))
 HometouchPlot1Sub
 
 #save Plot
@@ -7964,7 +7993,7 @@ HometouchPlot1Sub
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomeTeamTouchData,  title = paste0(Match_Home, " Team On Ball Touch"),
                                      plot_start = 50, plot_finish = 110, color = Color_Home, logo = "", method = "mad",
-                                     subtitle = paste0(Match_Fixture, " Up to 1st Sub"))
+                                     subtitle = paste0(Match_Fixture, " Up to 2nd Half"))
 HometouchPlot1Sub
 
 #save Plot
@@ -7973,22 +8002,56 @@ HometouchPlot1Sub
 ```
 
 ## Row {.flow}
-
+### column {.tabset}
 ```{r}
-#| label: away player touch plot
+#| title: Away player touch plot 1st Subs
+#| label: Away player touch plot 1st Subs
 #| height: 100%
 #| message: false
-#team touch plots Away
+
 AwayconvexPlot1stSubs <- TouchPlayerPlot_AI(TouchDataAway,  title = Match_Away,
                                      plot_start = 00, plot_finish = firstSubAway,  color = Color_Away, text_color = Color_Away_Text, method = "mad",
                                      subtitle = paste0(Match_Fixture, " Up to 1st subs"))
 AwayconvexPlot1stSubs
 
 ```
+
+```{r}
+#| title: Away player touch plot 1st Half
+#| label: Away player touch plot 1st Half
+#| height: 100%
+#| message: false
+#team touch plots Away
+TouchDataAway1 <- TouchDataAway %>%
+  filter(period == 1)
+
+AwayconvexPlot1sthalf <- TouchPlayerPlot_AI(TouchDataAway1,  title = Match_Away,
+                                     plot_start = 00, plot_finish = ,  color = Color_Away, text_color = Color_Away_Text, method = "mad",
+                                     subtitle = paste0(Match_Fixture, " Up to 1st Half"))
+AwayconvexPlot1sthalf
+
+```
+
+```{r}
+#| title: Away player touch plot 2nd Half
+#| label: Away player touch plot 2nd Half
+#| height: 100%
+#| message: false
+#team touch plots Away
+TouchDataAway2 <- TouchDataAway %>%
+  filter(period == 2)
+
+AwayconvexPlot2ndhalf <- TouchPlayerPlot_AI(TouchDataAway2,  title = Match_Away,
+                                     plot_start = 00, plot_finish = ,  color = Color_Away, text_color = Color_Away_Text, method = "mad",
+                                     subtitle = paste0(Match_Fixture, " Up to 2nd Half"))
+AwayconvexPlot2ndhalf
+
+```
+
 ### column {.tabset}
 ```{r}
 #| title: On ball touch plot 1st subs
-#| label: away team touch plot 1st subs
+#| label: Away team touch plot 1st subs
 #| height: 100%
 #| message: false
 
@@ -8004,7 +8067,7 @@ AwaytouchPlot1Sub
 
 ```{r}
 #| title: On ball touch plot 1st Half
-#| label: away team touch plot 1st half
+#| label: Away team touch plot 1st half
 #| height: 100%
 
 AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
@@ -8019,7 +8082,7 @@ AwaytouchPlot1Sub
 
 ```{r}
 #| title: On ball touch plot 2nd Half
-#| label: away team touch plot 2nd half
+#| label: Away team touch plot 2nd half
 #| height: 100%
 
 AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
