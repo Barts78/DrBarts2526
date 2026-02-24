@@ -8070,10 +8070,10 @@ AwaytouchPlot1Sub
 #| label: Away team touch plot 1st half
 #| height: 100%
 
-AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
+AwaytouchPlot1half <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
                                        plot_start = 00, plot_finish = 45, palette =, color = Color_Away, method = "mad",
                                        subtitle = paste0(Match_Fixture, " 1st Half"))
-AwaytouchPlot1Sub
+AwaytouchPlot1half
 
 #save Plot
 #ggsave(path = Vizlocation, "Away Team On Ball Touch Zones 1st Half.png", width = 2500, height = 2150, units = "px", dpi = 400)
@@ -8085,10 +8085,10 @@ AwaytouchPlot1Sub
 #| label: Away team touch plot 2nd half
 #| height: 100%
 
-AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
+AwaytouchPlot2ndhalf <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
                                        plot_start = 50, plot_finish = 110, palette =, color = Color_Away, method = "mad",
                                        subtitle = paste0(Match_Fixture, " 2nd Half"))
-AwaytouchPlot1Sub
+AwaytouchPlot2ndhalf
 
 #save Plot
 #ggsave(path = Vizlocation, "Away Team On Ball Touch Zones 2nd Half.png", width = 2500, height = 2150, units = "px", dpi = 400)
