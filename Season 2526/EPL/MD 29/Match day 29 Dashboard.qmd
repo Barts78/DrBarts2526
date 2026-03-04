@@ -29,9 +29,6 @@ format:
 #| message: false
 
 library(tidyverse)
-#library(shiny)
-#library(gifski)
-#library(magick)
 library(systemfonts)
 library(sysfonts)
 library(fontawesome)
@@ -39,12 +36,9 @@ library(glue)
 library(worldfootballR)
 library(gganimate)
 library(ggsoccer)
-#library(paletteer)
 library(ggpointdensity)
 library(ggthemes)
 library(ggtext)
-#library(ggiraph)
-#library(ggiraphExtra)
 library(ggimage)
 library(gt)
 library(gtExtras)
@@ -53,10 +47,8 @@ library(ggdensity)
 library(treemapify)
 library(readxl)
 library(writexl)
-#library(chromote)
 library(ggrepel)
 library(png)
-#library(patchwork)
 library(plotly)
 library(reshape)
 library(psych)
@@ -2321,7 +2313,7 @@ custom_colors <- c(Match_Home = Color_Home, "Match Drawn" = "gray", Match_Away =
 
 ```
 
-## Row {.tabset}
+## Match Summary {.tabset}
 ```{r}
 #| title: Match Summary tables
 #| label: Summary tables
@@ -2939,7 +2931,7 @@ MatchSummaryGameNameTable
 
 ```
 
-## Row {.flow}
+## Match Probablity {.flow}
 ```{r}
 #| label: Match Goals Probablity Plot
 # Create a tiled plot for the MC Match scores
@@ -3009,10 +3001,10 @@ MD_MC_Result_Plot
 #save Plot
 #ggsave(path = Vizlocation, "Match Result Probablity Plot.png", width = 2500, height = 2150, units = "px", dpi = 400)
 ```
-## Row {.flow}
+## Match Territory {.flow}
 ```{r}
-#|label: Home Match teratitory plot
-#|title: Home Match teratitory plot 
+#|label: Home Match territory plot
+#|title: Home Match territory plot 
 #data imports
 df <- plottingData %>%
   arrange(expandedMinute) %>%
@@ -3456,6 +3448,7 @@ PassConnectiondata <- PassConnections %>%
 #| label: Home 1st Half passnetwork
 
 
+
 HomepassPlot1stWD <- plot_passnet_AI(data = plottingData,
                                   team_name = Match_Home, scale_stat = "EPV", 
                                   scale_color = Color_Home, text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " 1st Half"),
@@ -3472,18 +3465,18 @@ HomepassPlot1stWD
 #| label: Home 2nd Half passnetwork
 
 
+
 HomepassPlot2ndWD <- plot_passnet_AI(data = plottingData,  
                                   team_name = Match_Home, scale_stat = "EPV", 
                                   scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " 2nd Half"),
                                   plot_start = 47, plot_finish = 100, pressmap = "Yes", logo = "", passes = 5)
 HomepassPlot2ndWD
 
-#save Plot
-#ggsave(path = Vizlocation, "Home Passnetwork 2nd  half.png", width = 2500, height = 2150, units = "px", dpi = 400)
 ```
 ``` {r}
 #| title: Passnetwork first Goal 
 #| label: Home passnetwork First Goal
+
 HomepassPlot20m <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Home, scale_stat = "EPV", 
                                         scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " Up to First Goal"),
@@ -3496,19 +3489,19 @@ HomepassPlot20m
 #| label: Away 1st Half passnetwork
 
 
+
 AwaypassPlot1stWD <- plot_passnet_AI(data = plottingData,  
                                    team_name = Match_Away, scale_stat = "EPV", 
                                    scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " 1st Half"),
                                    plot_start = 00, plot_finish = 44, pressmap = "Yes", logo = "", passes = 5)
 AwaypassPlot1stWD
 
-#save Plot
-#ggsave(path = Vizlocation, "Away Passnetwork 1st  half.png", width = 2500, height = 2150, units = "px", dpi = 400)
 ```
 
 ```{r}
 #| title: Away 2nd Half passnetwork
 #| label: Away 2nd Half passnetwork
+
 
 
 AwaypassPlot2ndWD <- plot_passnet_AI(data = plottingData,  
@@ -3517,12 +3510,12 @@ AwaypassPlot2ndWD <- plot_passnet_AI(data = plottingData,
                                    plot_start = 46, plot_finish = 100, pressmap = "Yes", logo = "", passes = 5)
 AwaypassPlot2ndWD
 
-#save Plot
-#ggsave(path = Vizlocation, "Away Passnetwork 2nd  half.png", width = 2500, height = 2150, units = "px", dpi = 400)
+
 ```
 ``` {r}
 #| title: Passnetwork First Goal 
 #| label: Away passnetwork first Goal
+
 
 AwaypassPlot20m <- plot_passnet_AI(data = plottingData,  
                                    team_name = Match_Away, scale_stat = "EPV", 
@@ -3536,19 +3529,19 @@ AwaypassPlot20m
 ```{r}
 #| title: Home Passnetwork to 1st Sub 
 #| label: Home 1st subs passnetwork
+
 HomepassPlot1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                    team_name = Match_Home, scale_stat = "EPV", 
                                    scale_color = Color_Home, text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " to 1st Subs"),
                                    plot_start = 00, plot_finish = firstSubHome, pitch = "", wrap = "", pressmap = "Yes", logo = "", passes = 5)
 HomepassPlot1stsubsWD
 
-#save Plot
-#ggsave(path = Vizlocation, "Home Passnetwork 1st Sub.png", width = 2500, height = 2150, units = "px", dpi = 400)
 ```
 
 ``` {r}
 #| title: Home Passnetwork Post 1st Sub 
 #| label: Home post 1st subs passnetwork
+
 HomepassPlotPost1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Home, scale_stat = "EPV", 
                                         scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " Post 1st Subs"),
@@ -3561,19 +3554,19 @@ HomepassPlotPost1stsubsWD
 #| title: Away Passnetwork to 1st Sub 
 #| label: Away 1st subs passnetwork
 
+
 AwaypassPlot1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                    team_name = Match_Away, scale_stat = "EPV", 
                                    scale_color = Color_Away, text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " to 1st Subs"),
                                    plot_start = 00, plot_finish = firstSubAway, pitch = "", wrap = "", pressmap = "Yes", logo = "", passes = 5)
 AwaypassPlot1stsubsWD
 
-#save Plot
-#ggsave(path = Vizlocation, "Away Passnetwork 1st Sub.png", width = 2500, height = 2150, units = "px", dpi = 400)
 ```
 
 ``` {r}
 #| title: Away Passnetwork post 1st Sub 
 #| label: Away post 1st subs passnetwork
+
 AwaypassPlotpost1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Away, scale_stat = "EPV", 
                                         scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " Post 1st Subs"),
@@ -3585,7 +3578,7 @@ AwaypassPlotpost1stsubsWD
 ```{r}
 #| title: Home Attacking Passnetwork 1st Half
 #| label: Home Attacking Passnetwork 1st Half
-#pass map EPV Home 1st half
+
 HomepassPlot1stAtt <- plot_passnet_AI(data = plottingData, 
                                   team_name = Match_Home, scale_stat = "EPV", 
                                   scale_color = Color_Home, text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " 1st Half"),
@@ -11207,7 +11200,7 @@ DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
   geom_point(data = AwayAverage_PlayerFTS, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.5, linewidth = 0.5) +
 
   # add zone percentage numbers
   geom_text(data = average_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
@@ -11254,7 +11247,7 @@ DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
   geom_point(data = AwayAverage_PlayerFTU, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.5, linewidth = 0.5) +
 
   # add zone percentage numbers
   geom_text(data = average_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
@@ -11288,11 +11281,27 @@ DefEPVHeatMapplotFTU
 #| height: 100%
 #| label: Away Successful EPV Heat Map FT
 #| title: Away Successful EPV Heat Map FT
+
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+AwayEvents_FTS_w <- AwayDefEPVHeatMapDataFTS %>%
+  mutate(epv = pmax(Successful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+
+
 AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
-  geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
   annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
 
@@ -11300,18 +11309,20 @@ AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
   #plot player positions
   geom_point(data = Average_PlayerFTS, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
+   #plot player names
+  geom_text(data = Average_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
   #plot heat map
-  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  #stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.5, linewidth = 0, colour = NA) +
+  stat_density_2d(  data = AwayEvents_FTS_w, aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.8, linewidth = 0, colour = NA) +
   
   # add zone percentage numbers
   geom_text(data = Awayaverage_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
   
-  #plot player names
-  geom_text(data = Average_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
-  
+
   #set colors
-  scale_fill_gradientn(colors = ColorScale_AwayC) +
-  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
   
   #formatting
   labs(title = paste(Match_Away," Successful Defensive EPV Heat Map \nFull Game - Open Play "), 
@@ -11335,11 +11346,26 @@ AwayDefEPVHeatMapplotFTS
 #| height: 100%
 #| label: Away Unsuccessful EPV Heat Map FT
 #| title: Away Unsuccessful EPV Heat Map FT
+
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+AwayEvents_FTU_w <- AwayDefEPVHeatMapDataFTU %>%
+  mutate(epv = pmax(Unsuccessful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+
 AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
-  geom_tile() +
   annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
   annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
 
@@ -11347,23 +11373,35 @@ AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
   #plot player positions
   geom_point(data = Average_PlayerFTU, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
+  #plot player names
+  geom_text(data = Average_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
   #plot heat map
-  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.4, linewidth = 0.5) +
+  #stat_density_2d(  data = AwayEvents_FTU_w, aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.8, linewidth = 0, colour = NA) +
+  
+  stat_density_2d(
+  data = AwayEvents_FTU_w,
+  aes(x = x, y = y, fill = after_stat(level)),
+  geom = "polygon",
+  n = 300,
+  bins = 8,
+  adjust = 0.8,
+  alpha = 0.35,
+  colour = NA
+) +
   
   # add zone percentage numbers
   geom_text(data = Awayaverage_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
   
-  #plot player names
-  geom_text(data = Average_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
-  
   #set colors
-  scale_fill_gradientn(colors = ColorScale_AwayC) +
-  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
   
   #formatting
   labs(title = paste(Match_Away," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play "), 
                             subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher, EPV, Box figures = % of Total EPV \nDirection of Attack Right to Left"),
        caption =  My_caption) +
+  #coord_cartesian(xlim = c(0, 100), ylim = c(0, 100), expand = FALSE) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
