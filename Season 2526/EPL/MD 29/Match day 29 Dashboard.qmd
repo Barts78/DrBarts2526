@@ -11184,9 +11184,13 @@ Awayaverage_DefepvNZFTU <- Awayaverage_DefepvNZFTU %>%
 
 ### Column {.tabset}
 ```{r}
-#| height: 100%
-#| label: Home Successful EPV Heat Map FT
-#| title: Home Successful EPV Heat Map FT
+#| label: Home Successful Def EPV and Events Heat Map
+#| title: Successful EPV and Events Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
+
+
 DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -11209,19 +11213,19 @@ DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
   geom_text(data = AwayAverage_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
     #set scales
-   scale_fill_gradientn(colors = ColorScale_HomeC) +
-   scale_color_gradientn(colors = ColorScale_HomeC) +
+   scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+   scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
 
   #formatting
   labs(title = paste0(Match_Home," Successful Defensive EPV Heat Map \nFull Game - Open Play"), 
-                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced, Box figures = % of Total Defensive EPV \nDirection of Attack Right to Left"),
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Events Faced \nBox figures = % of Total Def EPV, Direction of Attack Right to Left"),
        caption =  My_caption) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "#DBDBDB"), 
@@ -11231,9 +11235,12 @@ DefEPVHeatMapplotFTS
 ```
 
 ```{r}
-#| height: 100%
-#| label: Home Unsuccessful EPV Heat Map FT
-#| title: Home Unsuccessful EPV Heat Map FT
+#| label: Home Unsuccessful Def EPV and Events Heat Map
+#| title: Unsuccessful EPV and Events Heat Map FT
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
+
 DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -11256,19 +11263,171 @@ DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
   geom_text(data = AwayAverage_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
   
     #set scales
-   scale_fill_gradientn(colors = ColorScale_HomeC) +
-   scale_color_gradientn(colors = ColorScale_HomeC) +
+   scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+   scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
 
   #formatting
   labs(title = paste0(Match_Home," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play"), 
-                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced, Box figures = % of Total Defensive EPV \nDirection of Attack Right to Left"),
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Events Faced \nBox figures = % of Total Def EPV, Direction of Attack Right to Left"),
        caption =  My_caption) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        legend.position = "none", 
+        legend.direction = "horizontal", 
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
+
+DefEPVHeatMapplotFTU
+```
+
+```{r}
+#| label: Home Successful Def EPV Heat Map FT
+#| title: Successful EPV Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
+
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+HomeEvents_FTS_w <- DefEPVHeatMapDataFTS %>%
+  mutate(epv = pmax(Successful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+
+DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  
+  #geometrics
+  #plot player positions
+  geom_point(data = AwayAverage_PlayerFTS, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+    #plot player names
+  geom_text(data = AwayAverage_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
+  
+  #plot heat map
+  #stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.5, linewidth = 0.5) +
+  
+  stat_density_2d(
+  data = HomeEvents_FTS_w,
+  aes(x = x, y = y, fill = after_stat(level)),
+  geom = "polygon",
+  n = 300,
+  bins = 8,
+  adjust = 0.6,
+  alpha = 0.35,
+  colour = NA
+) +
+
+  # add zone percentage numbers
+  geom_text(data = average_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+    
+    #set scales
+   scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+   scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+
+  #formatting
+  labs(title = paste0(Match_Home," Successful Defensive EPV Heat Map \nFull Game - Open Play"), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced\n Box figures = % of Total Def EPV, Direction of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 10),
+        legend.position = "none", 
+        legend.direction = "horizontal", 
+        legend.background = element_rect(fill = "#DBDBDB"), 
+        legend.key = element_rect(fill = "#DBDBDB"))
+
+DefEPVHeatMapplotFTS
+```
+
+```{r}
+#| label: Home Unsuccessful Def EPV Heat Map FT
+#| title: Unsuccessful EPV + Events Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
+
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+HomeEvents_FTU_w <- DefEPVHeatMapDataFTU %>%
+  mutate(epv = pmax(Successful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  geom_tile() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  
+  #geometrics
+  #plot player positions
+  geom_point(data = AwayAverage_PlayerFTU, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot player names
+  geom_text(data = AwayAverage_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
+  
+  #plot heat map
+  #stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.4, adjust = 0.5, linewidth = 0.5) +
+  
+  stat_density_2d(
+  data = HomeEvents_FTU_w,
+  aes(x = x, y = y, fill = after_stat(level)),
+  geom = "polygon",
+  n = 300,
+  bins = 8,
+  adjust = 0.6,
+  alpha = 0.35,
+  colour = NA
+) +
+
+  # add zone percentage numbers
+  geom_text(data = average_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+  
+  
+    #set scales
+   scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+   scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+
+  #formatting
+  labs(title = paste0(Match_Home," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play"), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced \nBox figures = % of Total Def EPV, Direction of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "#DBDBDB"), 
@@ -11278,9 +11437,11 @@ DefEPVHeatMapplotFTU
 ```
 ### Column {.tabset}
 ```{r}
-#| height: 100%
-#| label: Away Successful EPV Heat Map FT
-#| title: Away Successful EPV Heat Map FT
+#| label: Away Successful Def EPV Heat Map FT
+#| title: Successful Def EPV Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11326,14 +11487,14 @@ AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
   
   #formatting
   labs(title = paste(Match_Away," Successful Defensive EPV Heat Map \nFull Game - Open Play "), 
-                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher, EPV, Box figures = % of Total EPV \nDirection of Attack Right to Left"),
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced \nBox figures = % of Total EPV, Direction of Attack Right to Left"),
        caption =  My_caption) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -11343,9 +11504,11 @@ AwayDefEPVHeatMapplotFTS
 ```
 
 ```{r}
-#| height: 100%
-#| label: Away Unsuccessful EPV Heat Map FT
-#| title: Away Unsuccessful EPV Heat Map FT
+#| label: Away Unsuccessful Def EPV Heat Map FT
+#| title: Unsuccessful Def EPV Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11399,15 +11562,15 @@ AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
   
   #formatting
   labs(title = paste(Match_Away," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play "), 
-                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher, EPV, Box figures = % of Total EPV \nDirection of Attack Right to Left"),
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher EPV Faced \nBox figures = % of Total EPV, Direction of Attack Right to Left"),
        caption =  My_caption) +
   #coord_cartesian(xlim = c(0, 100), ylim = c(0, 100), expand = FALSE) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -11415,7 +11578,149 @@ AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
 AwayDefEPVHeatMapplotFTU
 
 ```
+```{r}
+#| label: Away Successful Def EPV and Events Heat Map FT
+#| title: Successful EPV and events Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
 
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+AwayEvents_FTS_w <- AwayDefEPVHeatMapDataFTS %>%
+  mutate(epv = pmax(Successful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+
+
+AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+
+  #geometrics
+  #plot player positions
+  geom_point(data = Average_PlayerFTS, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+   #plot player names
+  geom_text(data = Average_PlayerFTS, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
+  #plot heat map
+  #stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.5, linewidth = 0, colour = NA) +
+  stat_density_2d(  #data = AwayEvents_FTS_w, 
+    aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.8, linewidth = 0, colour = NA) +
+  
+  # add zone percentage numbers
+  geom_text(data = Awayaverage_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+  
+
+  #set colors
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  
+  #formatting
+  labs(title = paste(Match_Away," Successful Defensive EPV Heat Map \nFull Game - Open Play "), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Events Faced \nBox figures = % of Total EPV, Direction of Attack Right to Left"),
+       caption =  My_caption) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 10),
+        legend.position = "none", 
+        legend.background = element_blank(), 
+        legend.key = element_blank())
+
+AwayDefEPVHeatMapplotFTS
+
+```
+
+```{r}
+#| label: Away Unsuccessful Def EPV and Events Heat Map FT
+#| title: Unsuccessful EPV and Events Heat Map
+#| fig-width: 5.2
+#| fig-height: 4
+#| fig-dpi: 150
+
+epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+max_copies <- 60       # 30–100 is a good range
+
+AwayEvents_FTU_w <- AwayDefEPVHeatMapDataFTU %>%
+  mutate(epv = pmax(Unsuccessful_Def_EPV, 0)) %>%
+  filter(epv > epv_floor) %>%
+  mutate(
+    w = pmin(
+      max_copies,
+      pmax(1L, round(max_copies * epv / max(epv, na.rm = TRUE)))
+    )
+  ) %>%
+  uncount(weights = w)
+
+
+AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
+  ggplot(aes(x = x, y = y)) +
+  annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
+  theme_pitch() +
+  annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+  annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+
+  #geometrics
+  #plot player positions
+  geom_point(data = Average_PlayerFTU, aes(x, y), fill = Color_Home, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
+  
+  #plot player names
+  geom_text(data = Average_PlayerFTU, aes(x, y, label = player_shirt), color = Color_Home_Text, size = 4) +
+  
+  #plot heat map
+  #stat_density_2d(  data = AwayEvents_FTU_w, aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.8, linewidth = 0, colour = NA) +
+  
+  stat_density_2d(
+  #data = AwayEvents_FTU_w,
+  aes(x = x, y = y, fill = after_stat(level)),
+  geom = "polygon",
+  n = 300,
+  bins = 8,
+  adjust = 0.8,
+  alpha = 0.35,
+  colour = NA
+) +
+  
+  # add zone percentage numbers
+  geom_text(data = Awayaverage_DefepvNZFTU, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
+  
+  #set colors
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  
+  #formatting
+  labs(title = paste(Match_Away," Unsuccessful Defensive EPV Heat Map \nFull Game - Open Play "), 
+                            subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Events Faced \nBox figures = % of Total EPV, Direction of Attack Right to Left"),
+       caption =  My_caption) +
+  #coord_cartesian(xlim = c(0, 100), ylim = c(0, 100), expand = FALSE) +
+  theme(plot.background = element_rect(colour = "snow", fill = "snow"),
+        plot.caption = element_markdown(),
+        panel.background = element_rect(colour = "snow", fill = "snow"),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title.position = "plot",
+        plot.subtitle = element_text(colour = "black", size = 10),
+        legend.position = "none", 
+        legend.background = element_blank(), 
+        legend.key = element_blank())
+
+AwayDefEPVHeatMapplotFTU
+
+```
 # Off Ball Analysis
 ## Row
 ```{r}
