@@ -10533,6 +10533,8 @@ Awayaverage_epvNZFTW <- Awayaverage_epvNZFTW %>%
 ```
 ## Row
 ```{r}
+#| label: Home EPV Heat map FT Wrapped
+
 EPVHeatMapplotFTW <- EPVHeatMapDataFTW %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -10562,9 +10564,9 @@ EPVHeatMapplotFTW <- EPVHeatMapDataFTW %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank(),
@@ -10574,6 +10576,8 @@ EPVHeatMapplotFTW <- EPVHeatMapDataFTW %>%
 EPVHeatMapplotFTW
 ```
 ```{r}
+#| label: Away EPV Heat map FT Wrapped
+
 AwayEPVHeatMapplotFTW <- AwayEPVHeatMapDataFTW %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -10603,9 +10607,9 @@ AwayEPVHeatMapplotFTW <- AwayEPVHeatMapDataFTW %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 10),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank(),
@@ -11291,7 +11295,7 @@ DefEPVHeatMapplotFTU
 #| fig-height: 3.6
 #| fig-dpi: 150
 
-epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
+epv_floor  <- 0.00001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
 
 HomeEvents_FTS_w <- DefEPVHeatMapDataFTS %>%
@@ -11330,7 +11334,7 @@ DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
   geom = "polygon",
   n = 300,
   bins = 8,
-  adjust = 0.9,
+  adjust = 0.5,
   alpha = 0.35,
   colour = NA
 ) +
@@ -11367,8 +11371,8 @@ DefEPVHeatMapplotFTS
 #| fig-height: 3.6
 #| fig-dpi: 150
 
-epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
-max_copies <- 60       # 30–100 is a good range
+epv_floor  <- 0.00001   # raise/lower depending on how many zeros you have
+max_copies <- 100       # 30–100 is a good range
 
 HomeEvents_FTU_w <- DefEPVHeatMapDataFTU %>%
   mutate(epv = pmax(Successful_Def_EPV, 0)) %>%
@@ -11405,7 +11409,7 @@ DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
   geom = "polygon",
   n = 200,
   bins = 8,
-  adjust = 0.9,
+  adjust = 0.8,
   alpha = 0.35,
   colour = NA
 ) +
@@ -11617,7 +11621,7 @@ AwayDefEPVHeatMapplotFTS <- AwayDefEPVHeatMapDataFTS %>%
   #plot heat map
   #stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.5, linewidth = 0, colour = NA) +
   stat_density_2d(  #data = AwayEvents_FTS_w, 
-    aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.8, linewidth = 0, colour = NA) +
+    aes(x = x, y = y, fill = after_stat(level)), geom = "polygon", alpha = 0.35, bins = 8, n = 300, adjust = 0.5, linewidth = 0, colour = NA) +
   
   # add zone percentage numbers
   geom_text(data = Awayaverage_DefepvNZFTS, aes(x = x, y = y, label = paste(PEPV, "%")), size = 2) +
@@ -11690,7 +11694,7 @@ AwayDefEPVHeatMapplotFTU <- AwayDefEPVHeatMapDataFTU %>%
   geom = "polygon",
   n = 300,
   bins = 8,
-  adjust = 0.8,
+  adjust = 0.5,
   alpha = 0.35,
   colour = NA
 ) +
