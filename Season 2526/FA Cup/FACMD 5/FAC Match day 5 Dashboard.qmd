@@ -3257,7 +3257,7 @@ MD_MC_Plot
 ### Match Result {.tabset}
 ```{r}
 #| label: Match Result Probablity Plot
-#| title: Match Result Probablity xG only
+#| title: Match Result Probablity xG
 
 MD_MC_Result_Plot <- ggplot(outcome_prob) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
