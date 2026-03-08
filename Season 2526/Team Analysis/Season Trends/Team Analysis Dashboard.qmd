@@ -202,7 +202,10 @@ Match_Away <- paste0("All Oppo")
 Match_Home <- paste0("Liverpool")
 
 #set match date
-Game_date <- last(na.omit(plottingData$Game_date))
+plottingData <- plottingData %>%
+  mutate(Game_date = as.Date(trimws(Game_date), format = "%d-%m-%Y"))
+
+Game_date <- format(max(plottingData$Game_date, na.rm = TRUE), "%d-%m-%Y")
 
 #set Game name
 GameName <- paste0(Match_Home," vs ", Match_Away)
