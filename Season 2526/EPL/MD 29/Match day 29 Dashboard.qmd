@@ -2323,6 +2323,181 @@ MatchSummaryGameStateData <- MatchSummaryGameStateData %>%
 
 ```
 
+```{r}
+#| output: false
+#| message: false
+#| warning: false
+#| label: Match MC setup
+
+#Load data (opta Data)
+#Home team Dashboard data
+Homedashboard_data <- plottingData %>%
+  filter(TeamName == Match_Home) %>%
+  filter(TotalShots == 1) %>%
+  filter(!Own_Goals == 1  & TeamName == Match_Home) %>%
+  filter(!situation == "NA") %>%
+  filter(period != 5) %>%
+  mutate(TotalxG = cumsum(xG)) %>%
+  mutate(TotalNPxG = cumsum(NPxG)) %>%
+  mutate(TotalxGOT = cumsum(xGOT)) %>%
+  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
+  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(TotalxG), NA)) %>%
+  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
+  mutate(Goal_point_Y = as.numeric(Goal_point_Y)) %>%
+  select(x, y, Goal_point_Y, Goal_point_X, TotalxG, TotalNPxG, TotalxGOT, situation, TeamName, TotalShots, xG, NPxG, xGOT, OTShots, minute, expandedMinute, result = type, player = playerId, period, Game_Period)
+
+#Away dashboard data
+#Load data
+Awaydashboard_data <- plottingData %>%
+  filter(TeamName == Match_Away) %>%
+  filter(TotalShots == 1) %>%
+  filter(!Own_Goals == 1  & TeamName == Match_Away) %>%
+  filter(!situation == "NA") %>%
+  filter(period != 5) %>%
+  mutate(TotalxG = cumsum(xG)) %>%
+  mutate(TotalNPxG = cumsum(NPxG)) %>%
+  mutate(TotalxGOT = cumsum(xGOT)) %>%
+  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
+  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(TotalxG), NA)) %>%
+  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
+  mutate(Goal_point_Y = as.numeric(Goal_point_Y)) %>%
+  select(x, y, Goal_point_Y, Goal_point_X, TotalxG, TotalNPxG, TotalxGOT, situation, TeamName, TotalShots, xG, NPxG, xGOT, OTShots, minute, expandedMinute, result = type, player = playerId, period, Game_Period)
+
+#calculate match actual goals
+HomeTotalGoals <- sum(!is.na(ifelse(Homedashboard_data$type == "Goal", 1, NA)))
+AwayTotalGoals <- sum(!is.na(ifelse(Awaydashboard_data$type == "Goal", 1, NA)))
+
+# Define custom colors
+custom_colors <- c(Match_Home = Color_Home, "Match Drawn" = "gray", Match_Away = Color_Away)
+
+#run MC for Match outcomes and Match Score proablity using xG
+sim_results <- simulate_match_outcomes(
+  home_data = Homedashboard_data,
+  away_data = Awaydashboard_data,
+  home_xg_var = "xG",
+  away_xg_var = "xG",
+  actual_home_goals = HomeTotalGoals,
+  actual_away_goals = AwayTotalGoals,
+  method = "xg"
+)
+
+# Calculate probabilities for different outcomes
+Away_wins_prob <- (sum(sim_results$prob_matrix[upper.tri(sim_results$prob_matrix)])*100)
+Home_wins_prob <- (sum(sim_results$prob_matrix[lower.tri(sim_results$prob_matrix)])*100)
+tie_prob <- (sum(diag(sim_results$prob_matrix))*100)
+
+# Create a data frame for Match outcome bar chart
+outcome_prob <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
+                           Probability = c(Home_wins_prob, tie_prob, Away_wins_prob))
+
+outcome_prob <- outcome_prob %>%
+  mutate(Probability = round(Probability, 2))
+
+#create data frame for Match score tile plot
+long_prob_matrix <- sim_results$long_prob_matrix
+
+#redo factor to numeric the score probablity
+long_prob_matrix <- long_prob_matrix %>%
+  mutate(Home = as.numeric(as.character(Home)),
+         Away = as.numeric(as.character(Away)))
+
+#run MC for Match outcomes and Match Score proablity using xG and xGOT
+sim_results_blend <- simulate_match_outcomes(
+  home_data = Homedashboard_data,
+  away_data = Awaydashboard_data,
+  home_xg_var = "xG",
+  away_xg_var = "xG",
+  home_xgot_var = "xGOT",
+  away_xgot_var = "xGOT",
+  method = "blend",
+  xgot_weight = 0.5
+)
+
+# Calculate probabilities for different outcomes
+Away_wins_prob_blend <- (sum(sim_results_blend$prob_matrix[upper.tri(sim_results_blend$prob_matrix)])*100)
+Home_wins_prob_blend <- (sum(sim_results_blend$prob_matrix[lower.tri(sim_results_blend$prob_matrix)])*100)
+tie_prob_blend <- (sum(diag(sim_results_blend$prob_matrix))*100)
+
+# Create a data frame for Match outcome bar chart
+outcome_prob_blend <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
+                           Probability = c(Home_wins_prob_blend, tie_prob_blend, Away_wins_prob_blend))
+
+outcome_prob_blend <- outcome_prob_blend %>%
+  mutate(Probability = round(Probability, 2))
+
+#create data frame for Match score tile plot
+long_prob_matrix_blend <- sim_results_blend$long_prob_matrix
+
+#redo factor to numeric the score probablity
+long_prob_matrix_blend <- long_prob_matrix_blend %>%
+  mutate(Home = as.numeric(as.character(Home)),
+         Away = as.numeric(as.character(Away)))
+
+#run MC for Match outcomes and Match Score proablity using min
+sim_results_min <- simulate_match_outcomes(
+  home_data = Homedashboard_data,
+  away_data = Awaydashboard_data,
+  home_xg_var = "xG",
+  away_xg_var = "xG",
+  home_xgot_var = "xGOT",
+  away_xgot_var = "xGOT",
+  method = "min"
+)
+
+# Calculate probabilities for different outcomes
+Away_wins_prob_min <- (sum(sim_results_min$prob_matrix[upper.tri(sim_results_min$prob_matrix)])*100)
+Home_wins_prob_min <- (sum(sim_results_min$prob_matrix[lower.tri(sim_results_min$prob_matrix)])*100)
+tie_prob_min <- (sum(diag(sim_results_min$prob_matrix))*100)
+
+# Create a data frame for Match outcome bar chart
+outcome_prob_min <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
+                           Probability = c(Home_wins_prob_min, tie_prob_min, Away_wins_prob_min))
+
+outcome_prob_min <- outcome_prob_min %>%
+  mutate(Probability = round(Probability, 2))
+
+#create data frame for Match score tile plot
+long_prob_matrix_min <- sim_results_min$long_prob_matrix
+
+#redo factor to numeric the score probablity
+long_prob_matrix_min <- long_prob_matrix_min %>%
+  mutate(Home = as.numeric(as.character(Home)),
+         Away = as.numeric(as.character(Away)))
+
+#run MC for Match outcomes and Match Score proablity using max
+sim_results_max <- simulate_match_outcomes(
+  home_data = Homedashboard_data,
+  away_data = Awaydashboard_data,
+  home_xg_var = "xG",
+  away_xg_var = "xG",
+  home_xgot_var = "xGOT",
+  away_xgot_var = "xGOT",
+  method = "max"
+)
+
+# Calculate probabilities for different outcomes
+Away_wins_prob_max <- (sum(sim_results_max$prob_matrix[upper.tri(sim_results_max$prob_matrix)])*100)
+Home_wins_prob_max <- (sum(sim_results_max$prob_matrix[lower.tri(sim_results_max$prob_matrix)])*100)
+tie_prob_max <- (sum(diag(sim_results_max$prob_matrix))*100)
+
+# Create a data frame for Match outcome bar chart
+outcome_prob_max <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
+                           Probability = c(Home_wins_prob_max, tie_prob_max, Away_wins_prob_max))
+
+outcome_prob_max <- outcome_prob_max %>%
+  mutate(Probability = round(Probability, 2))
+
+#create data frame for Match score tile plot
+long_prob_matrix_max <- sim_results_max$long_prob_matrix
+
+#redo factor to numeric the score probablity
+long_prob_matrix_max <- long_prob_matrix_max %>%
+  mutate(Home = as.numeric(as.character(Home)),
+         Away = as.numeric(as.character(Away)))
+
+```
+
+
 ## Match Summary {.tabset}
 ```{r}
 #| title: Match Summary tables
@@ -2942,189 +3117,21 @@ MatchSummaryGameNameTable
 ```
 
 ## Match Probablity
-```{r}
-#| output: false
-#| message: false
-#| warning: false
-#| label: Match MC setup
-
-#Load data (opta Data)
-#Home team Dashboard data
-Homedashboard_data <- plottingData %>%
-  filter(TeamName == Match_Home) %>%
-  filter(TotalShots == 1) %>%
-  filter(!Own_Goals == 1  & TeamName == Match_Home) %>%
-  filter(!situation == "NA") %>%
-  filter(period != 5) %>%
-  mutate(TotalxG = cumsum(xG)) %>%
-  mutate(TotalNPxG = cumsum(NPxG)) %>%
-  mutate(TotalxGOT = cumsum(xGOT)) %>%
-  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
-  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(TotalxG), NA)) %>%
-  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
-  mutate(Goal_point_Y = as.numeric(Goal_point_Y)) %>%
-  select(x, y, Goal_point_Y, Goal_point_X, TotalxG, TotalNPxG, TotalxGOT, situation, TeamName, TotalShots, xG, NPxG, xGOT, OTShots, minute, expandedMinute, result = type, player = playerId, period, Game_Period)
-
-#Away dashboard data
-#Load data
-Awaydashboard_data <- plottingData %>%
-  filter(TeamName == Match_Away) %>%
-  filter(TotalShots == 1) %>%
-  filter(!Own_Goals == 1  & TeamName == Match_Away) %>%
-  filter(!situation == "NA") %>%
-  filter(period != 5) %>%
-  mutate(TotalxG = cumsum(xG)) %>%
-  mutate(TotalNPxG = cumsum(NPxG)) %>%
-  mutate(TotalxGOT = cumsum(xGOT)) %>%
-  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
-  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(TotalxG), NA)) %>%
-  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
-  mutate(Goal_point_Y = as.numeric(Goal_point_Y)) %>%
-  select(x, y, Goal_point_Y, Goal_point_X, TotalxG, TotalNPxG, TotalxGOT, situation, TeamName, TotalShots, xG, NPxG, xGOT, OTShots, minute, expandedMinute, result = type, player = playerId, period, Game_Period)
-
-#calculate match actual goals
-HomeTotalGoals <- sum(!is.na(ifelse(Homedashboard_data$type == "Goal", 1, NA)))
-AwayTotalGoals <- sum(!is.na(ifelse(Awaydashboard_data$type == "Goal", 1, NA)))
-
-# Define custom colors
-custom_colors <- c(Match_Home = Color_Home, "Match Drawn" = "gray", Match_Away = Color_Away)
-
-#run MC for Match outcomes and Match Score proablity using xG
-sim_results <- simulate_match_outcomes(
-  home_data = Homedashboard_data,
-  away_data = Awaydashboard_data,
-  home_xg_var = "xG",
-  away_xg_var = "xG",
-  actual_home_goals = HomeTotalGoals,
-  actual_away_goals = AwayTotalGoals,
-  method = "xg"
-)
-
-# Calculate probabilities for different outcomes
-Away_wins_prob <- (sum(sim_results$prob_matrix[upper.tri(sim_results$prob_matrix)])*100)
-Home_wins_prob <- (sum(sim_results$prob_matrix[lower.tri(sim_results$prob_matrix)])*100)
-tie_prob <- (sum(diag(sim_results$prob_matrix))*100)
-
-# Create a data frame for Match outcome bar chart
-outcome_prob <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
-                           Probability = c(Home_wins_prob, tie_prob, Away_wins_prob))
-
-outcome_prob <- outcome_prob %>%
-  mutate(Probability = round(Probability, 2))
-
-#create data frame for Match score tile plot
-long_prob_matrix <- sim_results$long_prob_matrix
-
-#redo factor to numeric the score probablity
-long_prob_matrix <- long_prob_matrix %>%
-  mutate(Home = as.numeric(as.character(Home)),
-         Away = as.numeric(as.character(Away)))
-
-#run MC for Match outcomes and Match Score proablity using xG and xGOT
-sim_results_blend <- simulate_match_outcomes(
-  home_data = Homedashboard_data,
-  away_data = Awaydashboard_data,
-  home_xg_var = "xG",
-  away_xg_var = "xG",
-  home_xgot_var = "xGOT",
-  away_xgot_var = "xGOT",
-  method = "blend",
-  xgot_weight = 0.5
-)
-
-# Calculate probabilities for different outcomes
-Away_wins_prob_blend <- (sum(sim_results_blend$prob_matrix[upper.tri(sim_results_blend$prob_matrix)])*100)
-Home_wins_prob_blend <- (sum(sim_results_blend$prob_matrix[lower.tri(sim_results_blend$prob_matrix)])*100)
-tie_prob_blend <- (sum(diag(sim_results_blend$prob_matrix))*100)
-
-# Create a data frame for Match outcome bar chart
-outcome_prob_blend <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
-                           Probability = c(Home_wins_prob_blend, tie_prob_blend, Away_wins_prob_blend))
-
-outcome_prob_blend <- outcome_prob_blend %>%
-  mutate(Probability = round(Probability, 2))
-
-#create data frame for Match score tile plot
-long_prob_matrix_blend <- sim_results_blend$long_prob_matrix
-
-#redo factor to numeric the score probablity
-long_prob_matrix_blend <- long_prob_matrix_blend %>%
-  mutate(Home = as.numeric(as.character(Home)),
-         Away = as.numeric(as.character(Away)))
-
-#run MC for Match outcomes and Match Score proablity using min
-sim_results_min <- simulate_match_outcomes(
-  home_data = Homedashboard_data,
-  away_data = Awaydashboard_data,
-  home_xg_var = "xG",
-  away_xg_var = "xG",
-  home_xgot_var = "xGOT",
-  away_xgot_var = "xGOT",
-  method = "min"
-)
-
-# Calculate probabilities for different outcomes
-Away_wins_prob_min <- (sum(sim_results_min$prob_matrix[upper.tri(sim_results_min$prob_matrix)])*100)
-Home_wins_prob_min <- (sum(sim_results_min$prob_matrix[lower.tri(sim_results_min$prob_matrix)])*100)
-tie_prob_min <- (sum(diag(sim_results_min$prob_matrix))*100)
-
-# Create a data frame for Match outcome bar chart
-outcome_prob_min <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
-                           Probability = c(Home_wins_prob_min, tie_prob_min, Away_wins_prob_min))
-
-outcome_prob_min <- outcome_prob_min %>%
-  mutate(Probability = round(Probability, 2))
-
-#create data frame for Match score tile plot
-long_prob_matrix_min <- sim_results_min$long_prob_matrix
-
-#redo factor to numeric the score probablity
-long_prob_matrix_min <- long_prob_matrix_min %>%
-  mutate(Home = as.numeric(as.character(Home)),
-         Away = as.numeric(as.character(Away)))
-
-#run MC for Match outcomes and Match Score proablity using max
-sim_results_max <- simulate_match_outcomes(
-  home_data = Homedashboard_data,
-  away_data = Awaydashboard_data,
-  home_xg_var = "xG",
-  away_xg_var = "xG",
-  home_xgot_var = "xGOT",
-  away_xgot_var = "xGOT",
-  method = "max"
-)
-
-# Calculate probabilities for different outcomes
-Away_wins_prob_max <- (sum(sim_results_max$prob_matrix[upper.tri(sim_results_max$prob_matrix)])*100)
-Home_wins_prob_max <- (sum(sim_results_max$prob_matrix[lower.tri(sim_results_max$prob_matrix)])*100)
-tie_prob_max <- (sum(diag(sim_results_max$prob_matrix))*100)
-
-# Create a data frame for Match outcome bar chart
-outcome_prob_max <- data.frame(Outcome = c(Match_Home, "Match Drawn", Match_Away),
-                           Probability = c(Home_wins_prob_max, tie_prob_max, Away_wins_prob_max))
-
-outcome_prob_max <- outcome_prob_max %>%
-  mutate(Probability = round(Probability, 2))
-
-#create data frame for Match score tile plot
-long_prob_matrix_max <- sim_results_max$long_prob_matrix
-
-#redo factor to numeric the score probablity
-long_prob_matrix_max <- long_prob_matrix_max %>%
-  mutate(Home = as.numeric(as.character(Home)),
-         Away = as.numeric(as.character(Away)))
-
-
-
-```
 ### Match Goals {.tabset}
 ```{r}
 #| label: Match Goals Probablity xG Plot
 #| title: Match Goals Probablity xG only
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Plot <- ggplot(long_prob_matrix, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 4, color = if_else(long_prob_matrix$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3139,11 +3146,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix, aes(x = as.numeric(Home), y = as.numeric(
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3155,10 +3162,17 @@ MD_MC_Plot
 ```{r}
 #| label: Match Goals Probablity Blended
 #| title: Match Goals Probablity Blended
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Plot <- ggplot(long_prob_matrix_blend, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 4, color = if_else(long_prob_matrix_blend$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_blend$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3173,11 +3187,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_blend, aes(x = as.numeric(Home), y = as.nu
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3189,10 +3203,17 @@ MD_MC_Plot
 ```{r}
 #| label: Match Goals Probablity max
 #| title: Match Goals Probablity Optimistic
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Plot <- ggplot(long_prob_matrix_max, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 4, color = if_else(long_prob_matrix_max$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_max$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3207,11 +3228,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_max, aes(x = as.numeric(Home), y = as.nume
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3223,10 +3244,17 @@ MD_MC_Plot
 ```{r}
 #| label: Match Goals Probablity min
 #| title: Match Goals Probablity Pessimistic
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Plot <- ggplot(long_prob_matrix_min, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 4, color = if_else(long_prob_matrix_min$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_min$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3241,11 +3269,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_min, aes(x = as.numeric(Home), y = as.nume
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3258,6 +3286,13 @@ MD_MC_Plot
 ```{r}
 #| label: Match Result Probablity Plot
 #| title: Match Result Probablity xG only
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Result_Plot <- ggplot(outcome_prob) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3265,8 +3300,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), vjust = -0.5,colour = "black") + 
-#  scale_fill_manual(values = custom_colors) +
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
        x = "", 
@@ -3275,11 +3309,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3293,6 +3327,13 @@ MD_MC_Result_Plot
 ```{r}
 #| label: Match Result Probablity Blended Plot
 #| title: Match Result Probablity Blended
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3300,7 +3341,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3310,11 +3351,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3328,6 +3369,13 @@ MD_MC_Result_Plot
 ```{r}
 #| label: Match Result Probablity Max Plot
 #| title: Match Result Probablity Optimistic
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3335,7 +3383,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3345,11 +3393,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3362,6 +3410,13 @@ MD_MC_Result_Plot
 ```{r}
 #| label: Match Result Probablity Min Plot
 #| title: Match Result Probablity Pessimistic
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3369,7 +3424,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3379,11 +3434,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 16),
+        plot.title = element_text(colour = "black", face = "bold", size = 12),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 14),
-        axis.text = element_text(colour = "black", size = 12),
-        axis.title = element_text(colour = "black", size = 12, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 10),
+        axis.text = element_text(colour = "black", size = 8),
+        axis.title = element_text(colour = "black", size = 8, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3397,6 +3452,13 @@ MD_MC_Result_Plot
 ```{r}
 #|label: Home Match territory plot
 #|title: Home Match territory plot 
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 #data imports
 df <- plottingData %>%
   arrange(expandedMinute) %>%
@@ -3532,6 +3594,13 @@ ggplot() +
 ```{r}
 #|label: Away Match teratitory plot
 #|title: Away Match teratitory plot
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 #data imports
 df <- plottingData %>%
   arrange(expandedMinute) %>%
@@ -3732,9 +3801,6 @@ HomepassPlot1stWD <- plot_passnet_AI(data = plottingData,
                                   scale_color = Color_Home, text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " 1st Half"),
                                   plot_start = 00, plot_finish = 44, pressmap = "Yes", logo = "", passes = 5)
 HomepassPlot1stWD
-
-#save Plot
-#ggsave(path = Vizlocation, "Home Passnetwork 1st  half.png", width = 2500, height = 2150, units = "px", dpi = 400)
 
 ```
 
@@ -4269,6 +4335,7 @@ PassConnectionTableAwayr
 ## Row {.flow}
 ```{r}
 #| label: home passing tree plot
+#| title: Home Passing Tree Plot
 
 PassConnectionTreeHome <- PassConnectiondata %>%
   filter(Receiver_Team == Match_Home, 
@@ -4315,8 +4382,8 @@ PassConnectionTreeHomePlot
 ```
 
 ``` {r}
-
 #| label: away passing tree plot
+#| title: Away Passing Tree Plot
 
 PassConnectionTreeAway <- PassConnectiondata %>%
   filter(Receiver_Team == Match_Away, 
@@ -4366,8 +4433,9 @@ PassConnectionTreeAwayPlot
 # Passing Analysis
 ## Row {.flow}
 ```{r}
-#| label:  home wave plot
+#| label:  Home Passing Wave plot
 #| title:  home wave plot
+
 touchpass_bar_data <- plottingData 
 
 touchpass_bar_data <- touchpass_bar_data %>%
@@ -4433,7 +4501,7 @@ touchpass_bar_plot
 ```
 
 ```{r}
-#| label:  Away wave plot
+#| label:  Away Passing Wave plot
 #| title:  Away wave plot
 Awaytouchpass_bar_data <- plottingData 
 
@@ -6002,7 +6070,9 @@ MatchSummaryPLayerData <- MatchSummaryPLayerData %>%
   mutate(`% T M Third` = Middle_Third_Touches / Touches) %>%
   mutate(`% T F 3rd` = Final_Third_Touches / Touches) %>%
   mutate(`% T PK Box` = PK_Box_Touches / Touches) %>%
-  mutate(`T / Min` = Touches / minutes_played) %>%
+  mutate(`T / Min` = Touches / minutes_played,
+         'Dribble Success' = Dribbles_Won / Dribbles_Total) %>%
+  
   mutate(Failed_Pass = round(Attempted_Passes - Successful_Passes, 2),
          Failed_Cross = round(Cross_Passes - Successful_Cross, 2),
          Failed_Dribble = round(Dribbles_Total - Dribbles_Won, 2),
@@ -6085,7 +6155,11 @@ MatchSummaryPLayerTouchesData <- MatchSummaryPLayerTouchesData %>%
          `Carries` = Successful_Carries, 
          `% Carries Prog` = `% P Carries`, 
          `% Carries F 3rd` = `% F 3rd Carries`, 
-         `% Carries D Prog`)
+         `% Carries D Prog`, 
+         'Total Dribbles' = Dribbles_Total,
+         'Dribbles Won' = Dribbles_Won,
+         'Dribbles Lost' = Dribbles_Lost, 
+         'Dribble Success')
 
 #data wrangling for detailed player stats table 3
 MatchSummaryPLayerShootingData <- MatchSummaryPLayerShootingData %>%
@@ -6360,7 +6434,8 @@ MatchSummaryPLayerSeasonData <- MatchSummaryPLayerSeasonData %>%
   mutate(`% T M Third` = Middle_Third_Touches / Touches) %>%
   mutate(`% T F 3rd` = Final_Third_Touches / Touches) %>%
   mutate(`% T PK Box` = PK_Box_Touches / Touches) %>%
-  mutate(`T / Min` = Touches / minutes_played) %>%
+  mutate(`T / Min` = Touches / minutes_played,
+         'Dribble Success' = Dribbles_Won / Dribbles_Total) %>%
   mutate(Failed_Pass = round(Attempted_Passes - Successful_Passes, 2),
          Failed_Cross = round(Cross_Passes - Successful_Cross, 2),
          Failed_Dribble = round(Dribbles_Total - Dribbles_Won, 2),
@@ -6487,7 +6562,11 @@ MatchSummaryPLayerTouchesSeasonData <- MatchSummaryPLayerTouchesSeasonData %>%
          `Carries` = Successful_Carries, 
          `% Carries Prog` = `% P Carries`, 
          `% Carries F 3rd` = `% F 3rd Carries`, 
-         `% Carries D Prog`)
+         `% Carries D Prog`, 
+         'Total Dribbles' = Dribbles_Total,
+         'Dribbles Won' = Dribbles_Won,
+         'Dribbles Lost' = Dribbles_Lost, 
+         'Dribble Success')
 
 #data wrangling for detailed player stats table 3
 MatchSummaryPLayerShootingSeasonData <- MatchSummaryPLayerShootingSeasonData %>%
@@ -6540,7 +6619,7 @@ MatchSummaryPLayerDefensiveSeasonData <- MatchSummaryPLayerDefensiveSeasonData %
 
 MatchSummaryPLayerSeasonDataP90 <- MatchSummaryPLayerSeasonData %>%
   mutate(P90 = (minutes_played / 90),
-         across(7:120, ~ round(.x / P90, 2)),
+         across(7:123, ~ round(.x / P90, 2)),
          Pass_Success = round((Successful_Passes / Attempted_Passes), 2),
          Aerial_Success = (Aerial_Won / Aerial_total),
          Duel_Success = (Ground_Duels_Won / Ground_Duels_Total),
@@ -6607,7 +6686,11 @@ MatchSummaryPLayerTouchesSeasonDataP90 <- MatchSummaryPLayerTouchesSeasonDataP90
          `Carries` = Successful_Carries, 
          `% Carries Prog` = `% P Carries`, 
          `% Carries F 3rd` = `% F 3rd Carries`, 
-         `% Carries D Prog`)
+         `% Carries D Prog`,
+         'Total Dribbles' = Dribbles_Total,
+         'Dribbles Won' = Dribbles_Won,
+         'Dribbles Lost' = Dribbles_Lost, 
+         'Dribble Success')
 
 #data wrangling for detailed player stats table 3
 MatchSummaryPLayerShootingSeasonDataP90 <- MatchSummaryPLayerShootingSeasonDataP90 %>%
@@ -6697,7 +6780,7 @@ MatchSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingData %>%
     locations = cells_row_groups(groups = everything())) %>%
   tab_spanner(label = "Expected Metrics", columns = c(6:7)) %>%
   tab_spanner(label = "Passes", columns = c(8:17)) %>%
-  tab_spanner(label = "receiving", columns = c(18:24)) %>%
+  tab_spanner(label = "Receiving", columns = c(18:24)) %>%
  tab_style(
     locations = cells_column_spanners('Passes'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
@@ -6705,7 +6788,7 @@ MatchSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingData %>%
     locations = cells_column_spanners('Expected Metrics'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
   tab_style(
-    locations = cells_column_spanners('receiving'),
+    locations = cells_column_spanners('Receiving'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
   tab_style(
     locations = cells_title(groups = "title"),
@@ -6753,8 +6836,8 @@ MatchSummaryPLayerTouchesTableHome <-
   row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
   cols_hide(Team) %>%
   cols_width(Name ~ px(100)) %>%
-  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
-  fmt_number(columns = c(10), decimals = 2) %>%
+  fmt_percent(columns = c(11:14, 16:18, 22), decimals = 0) %>%
+  fmt_number(columns = c(10, 19:21), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
   tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
@@ -6796,8 +6879,8 @@ MatchSummaryPLayerTouchesTableHome <-
     source_notes.font.size = 8,
     table.width = "100%") %>%
   tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
-  gt_color_rows(columns = c(10), palette = ColorScale_Home, domain = c(0,3)) %>% # touch/per min
-  gt_color_rows(columns = c(12:14, 16:18), palette = ColorScale_Home, domain = c(0,1)) # % scales
+  gt_color_rows(columns = c(10, 19:21), palette = ColorScale_Home, domain = c(0,3)) %>% # touch/per min
+  gt_color_rows(columns = c(12:14, 16:18, 22), palette = ColorScale_Home, domain = c(0,1)) # % scales
 MatchSummaryPLayerTouchesTableHome
 
 ```
@@ -6942,7 +7025,7 @@ SeasonSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingSeasonData %>%
     locations = cells_row_groups(groups = everything())) %>%
   tab_spanner(label = "Expected Metrics", columns = c(6:7)) %>%
   tab_spanner(label = "Passes", columns = c(8:17)) %>%
-  tab_spanner(label = "receiving", columns = c(18:24)) %>%
+  tab_spanner(label = "Receiving", columns = c(18:24)) %>%
  tab_style(
     locations = cells_column_spanners('Passes'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
@@ -6950,7 +7033,7 @@ SeasonSummaryPLayerPassingTableHome <- MatchSummaryPLayerPassingSeasonData %>%
     locations = cells_column_spanners('Expected Metrics'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
   tab_style(
-    locations = cells_column_spanners('receiving'),
+    locations = cells_column_spanners('Receiving'),
     style = list(cell_text(weight = "bold", size = 16))) %>%
   tab_style(
     locations = cells_title(groups = "title"),
@@ -6997,8 +7080,8 @@ SeasonSummaryPLayerTouchesTableHome <-
   row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
   cols_hide(Team) %>%
   cols_width(Name ~ px(100)) %>%
-  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
-  fmt_number(columns = c(10), decimals = 2) %>%
+  fmt_percent(columns = c(11:14, 16:18, 22), decimals = 0) %>%
+  fmt_number(columns = c(10, 19:21), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
   tab_spanner(label = "% Touches Thirds Breakdown", columns = c(11:14)) %>%
@@ -7041,7 +7124,7 @@ SeasonSummaryPLayerTouchesTableHome <-
     table.width = "100%") %>%
   tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
   gt_color_rows(columns = c(10), palette = ColorScale_Home, domain = c(0,3)) %>% # touch/per min
-  gt_color_rows(columns = c(12:14, 16:18), palette = ColorScale_Home, domain = c(0,1)) # % scales
+  gt_color_rows(columns = c(12:14, 16:18, 22), palette = ColorScale_Home, domain = c(0,1)) # % scales
 SeasonSummaryPLayerTouchesTableHome
 
 ```
@@ -7240,7 +7323,7 @@ SeasonSummaryPLayerTouchesTableHomeP90 <-
   row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
   cols_hide(Team) %>%
   cols_width(Name ~ px(100)) %>%
-  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
+  fmt_percent(columns = c(11:14, 16:18, 22), decimals = 0) %>%
   fmt_number(columns = c(10), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
@@ -7284,7 +7367,7 @@ SeasonSummaryPLayerTouchesTableHomeP90 <-
     table.width = "100%") %>%
   tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) %>%
   gt_color_rows(columns = c(10), palette = ColorScale_Home, domain = c(0,3)) %>% # touch/per min
-  gt_color_rows(columns = c(12:14, 16:18), palette = ColorScale_Home, domain = c(0,1)) # % scales
+  gt_color_rows(columns = c(12:14, 16:18, 22), palette = ColorScale_Home, domain = c(0,1)) # % scales
 SeasonSummaryPLayerTouchesTableHomeP90
 
 ```
@@ -7478,7 +7561,7 @@ MatchSummaryPLayerTouchesTableAway <- MatchSummaryPLayerTouchesData %>%
   row_group_order(groups = c("Keeper","Defender","Midfielder", "Forward")) %>%
   cols_hide(Team) %>%
   cols_width(Name ~ px(100)) %>%
-  fmt_percent(columns = c(11:14, 16:18), decimals = 0) %>%
+  fmt_percent(columns = c(11:14, 16:18, 22), decimals = 0) %>%
   fmt_number(columns = c(10), decimals = 2) %>%
   cols_align(align = "right", columns = everything()) %>%
   tab_spanner(label = "Touches (T) Breakdown", columns = c(5:10)) %>%
@@ -14522,7 +14605,7 @@ AwaytouchPlot2half
 
 # xG & Shot Analysis
 
-## Row
+## xG Line
 
 ```{r}
 #| label: home xG line
@@ -14616,7 +14699,7 @@ xGLinePlotAway <- Awaydashboard_data %>%
 xGLinePlotAway
 ```
 
-## Row
+## xG Density
 
 ```{r}
 #| label: home density plot
@@ -14736,9 +14819,7 @@ config(displayModeBar = TRUE,
 xGDensityPlotAway
 ```
 
-
-
-## Row
+## xG Bubble
 
 ```{r home bubble plot}
 #| lable: home bubble plot
@@ -14938,7 +15019,7 @@ AwayxGBubble_Plot_I
 
 ```
 
-## Row
+## xG Situation
 ### column {.tabset}
 ```{r}
 #| title: Full Time xG Situation
@@ -15212,14 +15293,18 @@ config(displayModeBar = TRUE,
 xGSituationBarAway_I
 #xGSituationBarAway
 ```
-## Row {.flow}
+## Shot Maps {.flow}
 ### column {.tabset}
 ```{r}
 #| title: Overall shot map
 #| label: Home overall shot map
-#| height: 200%
-#| out-height: 200%
-#| out-width: 100%
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 
 #shot map
 Home_S_plot <- plot_shot_AI(Homedashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team", mapName = Match_Home, teamColor = Color_Home, text_color = Color_Home_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", logo = "", wrap = "")
@@ -15281,9 +15366,13 @@ Home_S_plotWT_I
 ```{r}
 #| title: Overall Shot Map
 #| label: Away overall shot map
-#| height: 200%
-#| out-height: 200%
-#| out-width: 100%
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 150
 Away_S_plot <- plot_shot_AI(Awaydashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team",  mapName = Match_Away, teamColor = Color_Away, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta")
 
 #save Plot
