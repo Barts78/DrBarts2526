@@ -14599,8 +14599,8 @@ Away_AD_Regain_table
 ## Off Ball Touch Maps {.flow}
 ### Home {.tabset}
 ```{r}
-#| label: Home team off ball touch plot subs
 #| title: Off ball touch map to 1st subs
+#| label: Home team off ball touch plot subs
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 150
@@ -14613,8 +14613,8 @@ HometouchPlot1Sub
 
 ```
 ```{r}
+#| title: Off ball touch map to 1st Half
 #| label: Home team off ball touch plot 1st half
-#| title: Off ball touch map to 1st half
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 150
@@ -14627,8 +14627,8 @@ HometouchPlot1half
 
 ```
 ```{r}
-#| label: Home team off ball touch plot 2 half
-#| title: Off ball touch map to 2nd half
+#| title: Off ball touch map 2nd Half
+#| label: Home team off ball touch plot 2nd half
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 150
@@ -14659,7 +14659,7 @@ AwaytouchPlot1Sub
 ```
 ```{r}
 #| title: Off ball touch map to 1st Half
-#| label: Away team off ball touch plot 1 half
+#| label: Away team off ball touch plot 1st half
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 150
@@ -14674,7 +14674,7 @@ AwaytouchPlot1half
 ```
 ```{r}
 #| title: Off ball touch map 2nd Half
-#| label: Away team off ball touch plot 2 half
+#| label: Away team off ball touch plot 2nd half
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 150
