@@ -763,8 +763,11 @@ TouchPlayerPlot_AI <- function(
   }
 
   data <- data %>%
-    filter(`type/value` %in% c(1, 2, 3, 4, 7, 8, 9, 10:16, 41, 42, 44, 45, 50, 52, 54, 61, 73, 74),
-           `outcomeType/value` == 1) %>%
+    filter(
+      Successful_Touches == 1
+      #`type/value` %in% c(1, 2, 3, 4, 7, 8, 9, 10:16, 41, 42, 44, 45, 50, 52, 54, 61, 73, 74),
+           #`outcomeType/value` == 1
+      ) %>%
     drop_na(playerId, x, y) %>%
     filter(between(expandedMinute, plot_start, plot_finish))
 
@@ -781,21 +784,25 @@ TouchPlayerPlot_AI <- function(
 
   teamtitle <- paste(title, "Player Touch Areas")
   
-  # --- 1) Desired role order ---------------------------------------------------
-role_levels <- c("Keeper", "Defender", "Midfielder", "Attacker")
-facet_col   <- sym(facet_by)        # should be "playerId" for this function
+# --- 1) Desired role order ---------------------------------------------------
+role_levels <- c("Keeper", "Defender", "Midfielder", "Forward")
+facet_col   <- sym(facet_by)
 
-# --- 2) Build facet order from role, then name --------------------------------
-# (If a player appears with multiple roles, the first by role order is taken.)
+# --- 2) Build facet order: filter by minutes, then sort by role --------------
 facet_levels <- data %>%
-  distinct(!!facet_col, role) %>%
+  group_by(playerId, file_name) %>%
+  summarise(match_minutes = max(expandedMinute, na.rm = TRUE), .groups = "drop") %>%
+  group_by(playerId) %>%
+  summarise(total_minutes = sum(match_minutes, na.rm = TRUE), .groups = "drop") %>%
+  filter(total_minutes > 5) %>%
+  left_join(
+    data %>%
+      distinct(playerId, role),
+    by = "playerId"
+  ) %>%
   mutate(role = factor(role, levels = role_levels)) %>%
-  arrange(role, !!facet_col) %>%
-  pull(!!facet_col) %>%
-  as.character()
-
-# keep exactly 11 panels
-facet_levels <- facet_levels[seq_len(min(11, length(facet_levels)))]
+  arrange(role, desc(total_minutes), playerId) %>%
+  pull(playerId)
 
 # --- 3) Relevel the faceting variable in ALL datasets used in the plot --------
 data <- data %>%
@@ -816,14 +823,14 @@ PlayerPos <- PlayerPos %>%
     annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
     annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
     
-    geom_text(aes(y = 50, x = 74.7, label = "14"), size = 2, color = "grey") +
-    geom_text(aes(y = 71.05, x = 74.7, label = "LHS"), size = 2, color = "grey") +
-    geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 2, color = "grey") +
+    geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1.5, color = "grey") +
+    geom_text(aes(y = 71.05, x = 74.7, label = "LHS"), size = 1.5, color = "grey") +
+    geom_text(aes(y = 28.95, x = 74.7, label = "RHS"), size = 1.5, color = "grey") +
     
     geom_point(data = data, aes(x = x, y = y), alpha = 0.5, colour = "black", size = 1) +
     geom_polygon(aes(x = x, y = y), colour = color, alpha = 0.2, fill = color, size = 0.4) +
-    geom_point(data = PlayerPos, aes(x = x, y = y), colour = color, alpha = 0.8, shape = 19, size = 2) +
-    facet_wrap(as.formula(paste("~", facet_by)), ncol = 4) +
+    geom_point(data = PlayerPos, aes(x = x, y = y), colour = color, alpha = 0.8, shape = 19, size = 1.2) +
+    facet_wrap(as.formula(paste("~", facet_by)), ncol = 5) +
     labs(
       title = teamtitle,
       x = "",
@@ -836,9 +843,9 @@ Area = 75% of activity, Team Colour Dot = Player Average Position"),
       plot.background = element_rect(colour = "snow", fill = "snow"),
       panel.background = element_rect(colour = "snow", fill = "snow"),
       strip.background = element_rect(fill = color, color = "black", linetype = "solid", linewidth = 1),
-      strip.text = element_text(size = 8, colour = text_color),
-      plot.title = element_text(colour = "black", size = 14, face = "bold"),
-      plot.subtitle = element_text(colour = "black", size = 10),
+      strip.text = element_text(size = 6, colour = text_color),
+      plot.title = element_text(colour = "black", size = 10, face = "bold"),
+      plot.subtitle = element_text(colour = "black", size = 8),
       plot.caption = element_markdown(),
       axis.title.x = element_blank()
     )
@@ -3114,7 +3121,7 @@ MatchSummaryGameNameTable
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
@@ -3155,7 +3162,7 @@ MD_MC_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix_blend, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
@@ -3196,7 +3203,7 @@ MD_MC_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix_max, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
@@ -3237,7 +3244,7 @@ MD_MC_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix_min, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
@@ -3279,7 +3286,7 @@ MD_MC_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Result_Plot <- ggplot(outcome_prob) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3320,7 +3327,7 @@ MD_MC_Result_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3362,7 +3369,7 @@ MD_MC_Result_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3403,7 +3410,7 @@ MD_MC_Result_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
   geom_bar(aes(x = Outcome, y = Probability, fill = custom_colors), stat = "identity", colour = "black", width = 1)  +
@@ -3445,7 +3452,7 @@ MD_MC_Result_Plot
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 #data imports
 df <- plottingData %>%
   arrange(expandedMinute) %>%
@@ -3587,7 +3594,7 @@ ggplot() +
 
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 #data imports
 df <- plottingData %>%
   arrange(expandedMinute) %>%
@@ -8186,7 +8193,7 @@ SeasonSummaryPLayerDefensiveTableAwayP90 <- MatchSummaryPLayerDefensiveSeasonDat
 SeasonSummaryPLayerDefensiveTableAwayP90
 ```
 
-## Deibbles Duels and Touches
+## Dribbles Duels and Touches
 ```{r}
 #| output: false
 #| label: dribbles and duels data setup
@@ -8257,10 +8264,11 @@ AwayTeamTouchData <- TouchData %>%
 #| label: home player touch plot 1st Subs
 #| title: Home player touch plot 1st Subs
 #| height: 100%
+#| fig-dpi: 200
 #| message: false
 
 HomeconvexPlot1stsubs <- TouchPlayerPlot_AI(TouchDataHome,  title = Match_Home,
-                                    plot_start = 00, plot_finish = firstSubHome, color = Color_Home, text_color = Color_Home_Text, method = "mad",
+                                    plot_start = 00, plot_finish = (firstSubHome-1), color = Color_Home, text_color = Color_Home_Text, method = "mad",
                                     subtitle = paste0(Match_Fixture, " Up to 1st subs"))
 HomeconvexPlot1stsubs
 ```
@@ -8283,6 +8291,7 @@ HomeconvexPlot1sthalf
 #| label: home player touch plot 2nd Half
 #| title: Home player touch plot 2nd Half
 #| height: 100%
+#| fig-dpi: 200
 #| message: false
 
 TouchDataHome2 <- TouchDataHome %>%
@@ -8298,9 +8307,8 @@ HomeconvexPlot2ndhalf
 ```{r}
 #| title: On ball touch plot 1st subs
 #| label: Home team touch plot 1st subs
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomeTeamTouchData,  title = paste0(Match_Home, " Team On Ball Touch"),
                                      plot_start = 00, plot_finish = firstSubHome, color = Color_Home, logo = "", method = "mad",
@@ -8312,9 +8320,8 @@ HometouchPlot1Sub
 ```{r}
 #| title: On ball touch plot 1st Half
 #| label: home team touch plot 1st half
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomeTeamTouchData,  title = paste0(Match_Home, " Team On Ball Touch"),
                                      plot_start = 00, plot_finish = 45, color = Color_Home, logo = "", method = "mad",
@@ -8327,9 +8334,8 @@ HometouchPlot1Sub
 ```{r}
 #| title: On ball touch plot 2nd Half
 #| label: home team touch plot 2nd half
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomeTeamTouchData,  title = paste0(Match_Home, " Team On Ball Touch"),
                                      plot_start = 50, plot_finish = 110, color = Color_Home, logo = "", method = "mad",
@@ -8345,6 +8351,7 @@ HometouchPlot1Sub
 #| title: Away player touch plot 1st Subs
 #| label: Away player touch plot 1st Subs
 #| height: 100%
+#| fig-dpi: 200
 #| message: false
 
 AwayconvexPlot1stSubs <- TouchPlayerPlot_AI(TouchDataAway,  title = Match_Away,
@@ -8358,6 +8365,7 @@ AwayconvexPlot1stSubs
 #| title: Away player touch plot 1st Half
 #| label: Away player touch plot 1st Half
 #| height: 100%
+#| fig-dpi: 200
 #| message: false
 #team touch plots Away
 TouchDataAway1 <- TouchDataAway %>%
@@ -8374,6 +8382,7 @@ AwayconvexPlot1sthalf
 #| title: Away player touch plot 2nd Half
 #| label: Away player touch plot 2nd Half
 #| height: 100%
+#| fig-dpi: 200
 #| message: false
 #team touch plots Away
 TouchDataAway2 <- TouchDataAway %>%
@@ -8390,9 +8399,8 @@ AwayconvexPlot2ndhalf
 ```{r}
 #| title: On ball touch plot 1st subs
 #| label: Away team touch plot 1st subs
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
                                        plot_start = 00, plot_finish = firstSubAway, color = Color_Away, method = "mad",
@@ -8404,9 +8412,8 @@ AwaytouchPlot1Sub
 ```{r}
 #| title: On ball touch plot 1st Half
 #| label: Away team touch plot 1st half
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 AwaytouchPlot1half <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
                                        plot_start = 00, plot_finish = 45, palette =, color = Color_Away, method = "mad",
@@ -8419,9 +8426,8 @@ AwaytouchPlot1half
 ```{r}
 #| title: On ball touch plot 2nd Half
 #| label: Away team touch plot 2nd half
-#| fig-width: 4
-#| fig-height: 3.6
-#| fig-dpi: 150
+#| height: 100%
+#| fig-dpi: 200
 
 AwaytouchPlot2ndhalf <- TouchTeamPlot_OPTA(AwayTeamTouchData,  title = paste0(Match_Away, " Team On Ball Touch"),
                                        plot_start = 50, plot_finish = 110, palette =, color = Color_Away, method = "mad",
@@ -8438,6 +8444,7 @@ AwaytouchPlot2ndhalf
 #| title: Home Dribbles by Game Period
 #| label: Home Dribbles by Game Period
 #| height: 100%
+#| fig-dpi: 200
 HomeDribblesPlotT <- HomeDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
@@ -8481,6 +8488,7 @@ HomeDribblesPlotT
 #| title: Home Dules by Game Period
 #| label: Home Dules by Game Period
 #| height: 100%
+#| fig-dpi: 200
 HomeDulesPlotT <- HomeDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
@@ -8526,6 +8534,7 @@ HomeDulesPlotT
 #| title: Away Dribbles by Game Period
 #| label: Away Dribbles by Game Period
 #| height: 100%
+#| fig-dpi: 200
 AwayDribblesPlotT <- AwayDribblesmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
@@ -8568,6 +8577,7 @@ AwayDribblesPlotT
 #| title: Away Duels by Game Period
 #| label: Away Duels by Game Period
 #| height: 100%
+#| fig-dpi: 200
 AwayDulesPlotT <- AwayDuelsmapdata %>%
   ggplot(aes(x = x, y = y, group = Game_Period)) +
   
@@ -9879,6 +9889,7 @@ Awayaverage_epvNZFT <- Awayaverage_epvNZFT %>%
 ```{r}
 #| height: 100%
 #| label: Home EPV plot FT
+#| title: Home EPV plot FT
 EPVHeatMapplotFT <- EPVHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -9926,6 +9937,7 @@ EPVHeatMapplotFT
 ```{r}
 #| height: 100%
 #| label: Away EPV plot FT
+#| title: Away EPV plot FT
 AwayEPVHeatMapplotFT <- AwayEPVHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -10376,6 +10388,7 @@ Awayaverage_epvNZ2H <- Awayaverage_epvNZ2H %>%
 ### Home {.tabset}
 ```{r}
 #| height: 100%
+#| label: Home Threat 1st Half
 #| title: Home Threat 1st Half
 
 EPVHeatMapplot1H <- EPVHeatMapData1H %>%
@@ -10428,6 +10441,7 @@ EPVHeatMapplot1H
 ```{r}
 #| height: 100%
 #| title: Home Threat 2nd Half
+#| label: Home Threat 2nd Half
 
 EPVHeatMapplot2H <- EPVHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
@@ -11523,7 +11537,7 @@ Awayaverage_DefepvNZFTU <- Awayaverage_DefepvNZFTU %>%
 #| title: Successful EPV and Events Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 DefEPVHeatMapplotFTS <- DefEPVHeatMapDataFTS %>%
@@ -11574,7 +11588,7 @@ DefEPVHeatMapplotFTS
 #| title: Unsuccessful EPV and Events Heat Map FT
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 DefEPVHeatMapplotFTU <- DefEPVHeatMapDataFTU %>%
   ggplot(aes(x = x, y = y)) +
@@ -11624,7 +11638,7 @@ DefEPVHeatMapplotFTU
 #| title: Successful EPV Def Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.00001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11699,7 +11713,7 @@ DefEPVHeatMapplotFTS
 #| title: Unsuccessful EPV Def Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11772,7 +11786,7 @@ DefEPVHeatMapplotFTU
 #| title: Successful EPV and events Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11838,7 +11852,7 @@ AwayDefEPVHeatMapplotFTS
 #| title: Unsuccessful EPV and Events Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11912,7 +11926,7 @@ AwayDefEPVHeatMapplotFTU
 #| title: Successful Def EPV Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -11978,7 +11992,7 @@ AwayDefEPVHeatMapplotFTS
 #| title: Unsuccessful Def EPV Heat Map
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 epv_floor  <- 0.0001   # raise/lower depending on how many zeros you have
 max_copies <- 60       # 30–100 is a good range
@@ -12516,7 +12530,7 @@ Awayaverage_PPDANZ2H <- Awayaverage_PPDANZ2H %>%
 #| message: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePPDATimePlot <- HomePPDAPlotData %>%
   #canvas
@@ -12558,7 +12572,7 @@ HomePPDATimePlot
 #| message: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPPDATimePlot <- AwayPPDAPlotData %>%
   #canvas
@@ -12601,7 +12615,7 @@ AwayPPDATimePlot
 #| label: Home DA Heat Map FT
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePPDAHeatMapplotFT <- HomePPDAHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
@@ -12651,7 +12665,7 @@ HomePPDAHeatMapplotFT
 #| label: Away DA Heat Map FT
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 AwayPPDAHeatMapplotFT <- AwayPPDAHeatMapDataFT %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -12703,7 +12717,7 @@ AwayPPDAHeatMapplotFT
 #| label: Home Defensive actions to 1st Sub
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 HomePPDAHeatMapplot1sub <- HomePPDAHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
@@ -12752,7 +12766,7 @@ HomePPDAHeatMapplot1sub
 #| label: Home DAs Post 1st Sub
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePPDAHeatMapplotP1sub <- HomePPDAHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
@@ -12804,7 +12818,7 @@ HomePPDAHeatMapplotP1sub
 #| label: Away Defensive actions to 1st Sub
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPPDAHeatMapplot1sub <- AwayPPDAHeatMapData1sub %>%
   ggplot(aes(x = x, y = y)) +
@@ -12856,7 +12870,7 @@ AwayPPDAHeatMapplot1sub
 #| label: Away Defensive actions Post 1st Sub
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPPDAHeatMapplotP1sub <- AwayPPDAHeatMapDataP1sub %>%
   ggplot(aes(x = x, y = y)) +
@@ -12910,7 +12924,7 @@ AwayPPDAHeatMapplotP1sub
 #| label: Home Defensive actions 1st Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePPDAHeatMapplot1H <- HomePPDAHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
@@ -12962,7 +12976,7 @@ HomePPDAHeatMapplot1H
 #| label: Home Defensive actions 2nd Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePPDAHeatMapplot2H <- HomePPDAHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
@@ -13014,7 +13028,7 @@ HomePPDAHeatMapplot2H
 #| label: Away defensive actions 1st Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPPDAHeatMapplot1H <- AwayPPDAHeatMapData1H %>%
   ggplot(aes(x = x, y = y)) +
@@ -13067,7 +13081,7 @@ AwayPPDAHeatMapplot1H
 #| label: Away Defensive actions 2nd Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPPDAHeatMapplot2H <- AwayPPDAHeatMapData2H %>%
   ggplot(aes(x = x, y = y)) +
@@ -13582,7 +13596,7 @@ Away_Successful_AD_table_PP <- Away_player_receiver %>%
 #| label: Home Post DA Plot 1st Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePostPPDAHeatMapplot1st <- Home_Successful_Post_DA_Action %>%
   filter(period_displayName == "First Half") %>%
@@ -13669,7 +13683,7 @@ HomeSuccessful_DA_table
 #| label: Home Post DA Plot 2nd Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomePostPPDAHeatMapplot2nd <- Home_Successful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
@@ -13737,7 +13751,7 @@ HomeSuccessful_DA_table
 #| label: Away Post DA Plot 1st Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPostPPDAHeatMapplot1st <- Away_Successful_Post_DA_Action %>%
     filter(period_displayName == "First Half") %>%
@@ -13827,7 +13841,7 @@ AwaySuccessful_DA_table
 #| label: Away Post DA Plot 2nd Half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPostPPDAHeatMapplot2nd <- Away_Successful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
@@ -13894,7 +13908,7 @@ AwaySuccessful_DA_table
 #| label: Home Post DA Plot 1st Half unsuccessful
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomeUNPostPPDAHeatMapplot_1st <- Home_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "First Half") %>%
@@ -13984,7 +13998,7 @@ HomeUnSuccessful_DA_table
 #| label: Home Post DA Plot 2nd Half unsuccessful
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 HomeUNPostPPDAHeatMapplot2nd <- Home_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
@@ -14054,7 +14068,7 @@ HomeUnSuccessful_DA_table
 #| label: Away Post DA Plot 1st Half unsuccessful
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPostPPDAHeatMapplot1st <- Away_Unsuccessful_Post_DA_Action %>%
     filter(period_displayName == "First Half") %>%
@@ -14145,7 +14159,7 @@ AwayUnSuccessful_DA_table
 #| label: Away Post DA Plot 2nd Half unsuccessful
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayPostPPDAHeatMapplot2nd <- Away_Unsuccessful_Post_DA_Action %>%
   filter(period_displayName == "Second Half") %>%
@@ -14216,7 +14230,7 @@ AwayUnSuccessful_DA_table
 #| title: Home DA Regains Tree plot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 group <- Home_Successful_DA_table_PP$receiver
 subgroup <- Home_Successful_DA_table_PP$playerId
@@ -14265,7 +14279,7 @@ PostDAHomePlot
 #| title: Away DA Regains Tree plot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 group <- Away_Successful_DA_table_PP$receiver
 subgroup <- Away_Successful_DA_table_PP$playerId
@@ -14314,7 +14328,7 @@ PostDAAwayPlot
 #| results: asis
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Home_DA_Regain_table <- Home_Successful_DA_table_PP %>%
     select(
@@ -14360,7 +14374,7 @@ Home_DA_Regain_table
 #| results: asis
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 Away_DA_Regain_table <- Away_Successful_DA_table_PP %>%
@@ -14409,7 +14423,7 @@ Away_DA_Regain_table
 #| title: Home AD Regains Treeplot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 group <- Home_Successful_AD_table_PP$receiver
@@ -14457,7 +14471,7 @@ PostADHomePlot
 #| title: Away AD Regains Treeplot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 group <- Away_Successful_AD_table_PP$receiver
@@ -14507,7 +14521,7 @@ PostADAwayPlot
 #| results: asis
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 Home_AD_Regain_table <- Home_Successful_AD_table_PP %>%
@@ -14555,7 +14569,7 @@ Home_AD_Regain_table
 #| results: asis
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Away_AD_Regain_table <- Away_Successful_AD_table_PP %>%
     select(
@@ -14603,7 +14617,7 @@ Away_AD_Regain_table
 #| label: Home team off ball touch plot subs
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 HometouchPlot1Sub <- TouchTeamPlot_OPTA(HomePPDAHeatMapData,  title = paste0(Match_Home, " Team Off Ball Touch"),
@@ -14617,7 +14631,7 @@ HometouchPlot1Sub
 #| label: Home team off ball touch plot 1st half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 HometouchPlot1half <- TouchTeamPlot_OPTA(HomePPDAHeatMapData,  title = paste0(Match_Home, " Team Off Ball Touch"),
@@ -14631,7 +14645,7 @@ HometouchPlot1half
 #| label: Home team off ball touch plot 2nd half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 HometouchPlot2half <- TouchTeamPlot_OPTA(HomePPDAHeatMapData,  title = paste0(Match_Home, " Team Off Ball Touch"),
@@ -14648,7 +14662,7 @@ HometouchPlot2half
 #| label: Away team off ball touch plot subs
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 AwaytouchPlot1Sub <- TouchTeamPlot_OPTA(AwayPPDAHeatMapData,  title = paste0(Match_Away, " Team Off Ball Touch"),
@@ -14662,7 +14676,7 @@ AwaytouchPlot1Sub
 #| label: Away team off ball touch plot 1st half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 AwaytouchPlot1half <- TouchTeamPlot_OPTA(AwayPPDAHeatMapData,  title = paste0(Match_Away, " Team Off Ball Touch"),
@@ -14677,7 +14691,7 @@ AwaytouchPlot1half
 #| label: Away team off ball touch plot 2nd half
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 AwaytouchPlot2half <- TouchTeamPlot_OPTA(AwayPPDAHeatMapData,  title = paste0(Match_Away, " Team Off Ball Touch"),
@@ -14695,7 +14709,7 @@ AwaytouchPlot2half
 #| title: Home xG line
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
   xGLinePlot <- Homedashboard_data %>%
     ggplot() +
@@ -14743,7 +14757,7 @@ xGLinePlot
 #| title: Awat xG line
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 #canvas
 xGLinePlotAway <- Awaydashboard_data %>%
@@ -14795,7 +14809,7 @@ xGLinePlotAway
 #| label: Home Shot Density plot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 # Density Shot Map
 #canvas
@@ -14856,7 +14870,7 @@ xGDensityPlot
 #| label: Home Shot Density plot 1st
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 # Density Shot Map
 #canvas
@@ -14918,7 +14932,7 @@ xGDensityPlot
 #| label: Home Shot Density plot 2nd
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 # Density Shot Map
 #canvas
@@ -14981,7 +14995,7 @@ xGDensityPlot
 #| label: Away Shot Density plot FT
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 #canvas
@@ -15044,7 +15058,7 @@ xGDensityPlotAway
 #| label: Away Shot Density plot 1st
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 #canvas
@@ -15108,7 +15122,7 @@ xGDensityPlotAway
 #| label: Away Shot Density plot 2nd
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 #canvas
@@ -15175,7 +15189,7 @@ xGDensityPlotAway
 #| title: Home Threat and xG Bubble plot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 ShotBubblexG_data <- plottingData 
 
@@ -15277,7 +15291,7 @@ xGBubble_Plot_I
 #| title: Away Threat and xG Bubble plot
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 AwayShotBubblexG_data <- plottingData 
 
@@ -15383,7 +15397,7 @@ AwayxGBubble_Plot_I
 #| label: Home Situation plot ft
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 # Bar Plot
 
@@ -15477,7 +15491,7 @@ xGSituationBar_I
 #| label: Home Situation plot 2h
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 
 xGSituationBarData <- Homedashboard_data %>%
@@ -15527,7 +15541,7 @@ xGSituationBar_I
 #| label: Away Situation plot ft
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 xGSituationBarAwayData <- Awaydashboard_data %>%
     group_by(situation) %>%
@@ -15574,7 +15588,7 @@ xGSituationBarAway_I
 #| label: Away Situation plot 1h
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 xGSituationBarAwayData <- Awaydashboard_data %>%
   filter(period == 1) %>%
@@ -15623,7 +15637,7 @@ xGSituationBarAway_I
 #| label: Away Situation plot 2nd
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 xGSituationBarAwayData <- Awaydashboard_data %>%
   filter(period == 2) %>%
@@ -15676,7 +15690,7 @@ xGSituationBarAway_I
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 #shot map
 Home_S_plot <- plot_shot_AI(Homedashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team", mapName = Match_Home, teamColor = Color_Home, text_color = Color_Home_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", logo = "", wrap = "")
@@ -15704,7 +15718,7 @@ Home_S_plot_I
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Home_S_plotW <- plot_shot_AI(Homedashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team", mapName = Match_Home, teamColor = Color_Home, text_color = Color_Home_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", logo = "", wrap = "Player")
 
@@ -15726,7 +15740,7 @@ Home_S_plotW_I <- Home_S_plotW_I %>%
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Home_S_plotWT <- plot_shot_AI(Homedashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team", mapName = Match_Home, teamColor = Color_Home, text_color = Color_Home_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", logo = "", wrap = "Time")
 
@@ -15749,7 +15763,7 @@ Home_S_plotWT_I
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 Away_S_plot <- plot_shot_AI(Awaydashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team",  mapName = Match_Away, teamColor = Color_Away, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta")
 
 
@@ -15775,7 +15789,7 @@ Away_S_plot_I
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Away_S_plotW <- plot_shot_AI(Awaydashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team",  mapName = Match_Away, teamColor = Color_Away, text_color = Color_Away_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", wrap = "Player")
 
@@ -15798,7 +15812,7 @@ Away_S_plotW_I
 #| warning: false
 #| fig-width: 4
 #| fig-height: 3.6
-#| fig-dpi: 150
+#| fig-dpi: 200
 
 Away_S_plotWT <- plot_shot_AI(Awaydashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team",  mapName = Match_Away, teamColor = Color_Away, text_color = Color_Away_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", wrap = "Time")
 
