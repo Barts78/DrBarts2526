@@ -1510,10 +1510,10 @@ plot_passnet_AI <- function(data,
   
   #set title text
     PassNetTitle_text <- paste0(
-              glue("<span style='font-family:\"Arial\";color:{scale_color};font-size:14px;'>{team_name}</span><span style='color:gray12;font-size:14px;'> Pass Network</span>"))
+              glue("<span style='font-family:\"Arial\";color:{scale_color};font-size:10px;'>{team_name}</span><span style='color:gray12;font-size:10px;'> Pass Network</span>"))
   
   PassNetTitle_textD <- paste0(
-              glue("<span style='font-family:\"Arial Bold\";color:{scale_color};font-size:14px;'>{team_name}</span><span style='color:gray12;font-size:14px;'> Pass Network & </span><span style='font-family:\"Arial\";color:gray12;font-size:14px;'>Duels (</span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:14px;'>Unsuccessful</span><span style='color:gray12;font-size:14px;'> and </span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:14px;'>Successful</span><span style='color:gray12;font-size:14px;'>)</span>"))
+              glue("<span style='font-family:\"Arial Bold\";color:{scale_color};font-size:10px;'>{team_name}</span><span style='color:gray12;font-size:10px;'> Pass Network & </span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'>Duels (</span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:10px;'>Unsuccessful</span><span style='color:gray12;font-size:10px;'> and </span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:10px;'>Successful</span><span style='color:gray12;font-size:10px;'>)</span>"))
   
     # wrap or not
     if (wrap == "Yes") {
@@ -1526,10 +1526,10 @@ if (pressmap == "Yes") {
 }
 
 plotCaption <- paste0(
-  glue("<span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{subtitle}</span>
-       <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>, Line = </span>
-       <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{passes}</span>
-       <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>+ Passes, Thicker Line = More Passes</span>"))
+  glue("<span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{subtitle}</span>
+       <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>, Line = </span>
+       <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{passes}</span>
+       <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>+ Passes, Thicker Line = More Passes</span>"))
 
 # ---- Data wrangling --------------------------------------------------------
 
@@ -1670,13 +1670,13 @@ nodes <- nodes %>%
             plot.caption = element_markdown(),
             plot.background = element_rect(colour = "snow", fill = "snow"),
             panel.background = element_rect(colour = "snow", fill = "snow"),
-            legend.title = element_text(colour = "black", size = 6),
-            legend.text = element_text(colour = "black", size = 6),
+            legend.title = element_text(colour = "black", size = 4),
+            legend.text = element_text(colour = "black", size = 4),
             axis.title.x = element_blank()) +
 
         #Wrap the plots
           facet_wrap(as.formula(paste("~", Facet_by)), ncol = 4) +
-          theme(strip.text.x = element_text(face = "bold", size = 10, colour = text_color),
+          theme(strip.text.x = element_text(face = "bold", size = 6, colour = text_color),
               strip.background.x = element_rect(fill = scale_color, color = "black", linetype = "solid", linewidth = 1))
 
     } else if (wrap == "") {
@@ -1700,17 +1700,17 @@ nodes <- nodes %>%
       
       plotCaption <- paste0(
   glue("
-    <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{subtitle}</span><br>
-    <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>Line = </span>
-    <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{passes}</span>
-    <span style='font-family:\"Arial\";color:gray12;font-size:10px;'>+ Passes, Thicker Line = More Passes, Larger Circle = More Passes</span>"))
+    <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{subtitle}</span><br>
+    <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>Line = </span>
+    <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{passes}</span>
+    <span style='font-family:\"Arial\";color:gray12;font-size:8px;'>+ Passes, Thicker Line = More Passes, Larger Circle = More Passes</span>"))
 
             
             plotTag <- paste0(
-              glue("<span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{subtitle}</span"))
+              glue("<span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{subtitle}</span"))
             
             plotExplaination <- paste0(
-              glue("<span style='font-family:\"Arial\";color:gray12;font-size:10px;'>, Line =  </span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'>{passes}</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'>+ Passes, Thicker Line = More Passes</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'>, Darker Circle Colour = Higher Threat (EPV)</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;', Darker Line = Higher Pass Completion, Direction of Attack Right to Left</span>"))
+              glue("<span style='font-family:\"Arial\";color:gray12;font-size:8px;'>, Line =  </span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'>{passes}</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'>+ Passes, Thicker Line = More Passes</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'>, Darker Circle Colour = Higher Threat (EPV)</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;', Darker Line = Higher Pass Completion, Direction of Attack Right to Left</span>"))
 
 # Data Wrangling 
       
@@ -1827,7 +1827,7 @@ nodes <- nodes %>%
       
       #plot pressing data
       plot_passnet <- plot_passnet +
-        geom_point(data = PressData, aes(x = x, y = y, fill = outcome), shape = 21, size = 1.5, stroke = 0.5, show.legend = FALSE)
+        geom_point(data = PressData, aes(x = x, y = y, fill = outcome), shape = 21, size = 1, stroke = 0.5, show.legend = FALSE)
 
     } else if (pressmap == "") {
      
@@ -1880,7 +1880,6 @@ nodes <- nodes %>%
       #formatting
       labs(title = PassNetTitle_text,
            subtitle = plotCaption,
-           #tag = plotTag,
            x = "",
            colour = leg_title,
            caption = My_caption) +
@@ -1894,8 +1893,8 @@ nodes <- nodes %>%
             plot.tag = element_markdown(),
             plot.background = element_rect(colour = "snow", fill = "snow"),
             panel.background = element_rect(colour = "snow", fill = "snow"),
-            legend.title = element_text(colour = "black", size = 6),
-            legend.text = element_text(colour = "black", size = 6),
+            legend.title = element_text(colour = "black", size = 4),
+            legend.text = element_text(colour = "black", size = 4),
             axis.title.x = element_blank())
     }
     
@@ -3118,14 +3117,13 @@ MatchSummaryGameNameTable
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 2, color = if_else(long_prob_matrix$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3140,11 +3138,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix, aes(x = as.numeric(Home), y = as.numeric(
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3159,14 +3157,13 @@ MD_MC_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix_blend, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_blend$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 2, color = if_else(long_prob_matrix_blend$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3181,11 +3178,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_blend, aes(x = as.numeric(Home), y = as.nu
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3200,14 +3197,13 @@ MD_MC_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
 
 MD_MC_Plot <- ggplot(long_prob_matrix_max, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_max$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 2, color = if_else(long_prob_matrix_max$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3222,11 +3218,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_max, aes(x = as.numeric(Home), y = as.nume
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3248,7 +3244,7 @@ MD_MC_Plot
 
 MD_MC_Plot <- ggplot(long_prob_matrix_min, aes(x = as.numeric(Home), y = as.numeric(Away), fill = Probability)) +
   geom_tile(colour = "black") +
-  geom_text(aes(label = paste(Probability, "%")), size = 3, color = if_else(long_prob_matrix_min$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
+  geom_text(aes(label = paste(Probability, "%")), size = 2, color = if_else(long_prob_matrix_min$Probability > 4.5, Color_Home_Text, Color_Away_Text),) +
         scale_fill_gradientn(
         colors = c(Color_Away, Color_Home),
         values = scales::rescale(c(0, 1)), 
@@ -3263,11 +3259,11 @@ MD_MC_Plot <- ggplot(long_prob_matrix_min, aes(x = as.numeric(Home), y = as.nume
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3283,7 +3279,6 @@ MD_MC_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3294,7 +3289,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 2, vjust = -0.5,colour = "black") + 
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
        x = "", 
@@ -3303,11 +3298,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3324,7 +3319,6 @@ MD_MC_Result_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3335,7 +3329,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 2, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3345,16 +3339,15 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_blend) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
         legend.key = element_rect(fill = "snow"))
-
 MD_MC_Result_Plot
 
 ```
@@ -3366,7 +3359,6 @@ MD_MC_Result_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3377,7 +3369,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 2, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3387,11 +3379,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_max) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3407,7 +3399,6 @@ MD_MC_Result_Plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3418,7 +3409,7 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
                       breaks = c(Color_Home,"gray", Color_Away),
                       labels = c(Match_Home, "Match Drawn", Match_Away),
                       guide = "legend") +
-  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 3, vjust = -0.5,colour = "black") + 
+  geom_text(aes(x = Outcome, y = Probability, label = paste(Probability, " %")), size = 2, vjust = -0.5,colour = "black") + 
 #  scale_fill_manual(values = custom_colors) +
   labs(title = "Probabilities of Match Outcome (10000 Sims)",
        subtitle = Match_Fixture,
@@ -3428,11 +3419,11 @@ MD_MC_Result_Plot <- ggplot(outcome_prob_min) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 12),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 10),
-        axis.text = element_text(colour = "black", size = 8),
-        axis.title = element_text(colour = "black", size = 8, face = "bold"),
+        plot.subtitle = element_text(colour = "black", size = 8),
+        axis.text = element_text(colour = "black", size = 6),
+        axis.title = element_text(colour = "black", size = 6, face = "bold"),
         legend.position = "none", 
         legend.direction = "horizontal", 
         legend.background = element_rect(fill = "snow"), 
@@ -3444,12 +3435,11 @@ MD_MC_Result_Plot
 
 ## Match Territory {.flow}
 ```{r}
-#|label: Home Match territory plot
-#|title: Home Match territory plot 
+#| label: Home Match territory plot
+#| title: Home Match territory plot 
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3570,7 +3560,7 @@ ggplot() +
     plot.caption = element_markdown(),
     legend.title = element_text(colour = "black", size = 6),
     legend.text  = element_text(colour = "black", size = 6),
-    axis.title = element_text(colour = "black", size = 8),
+    axis.title = element_text(colour = "black", size = 6),
     
     plot.margin  = margin(28, 20, 48, 20)
   ) +
@@ -3586,12 +3576,11 @@ ggplot() +
 
 ```
 ```{r}
-#|label: Away Match teratitory plot
-#|title: Away Match teratitory plot
+#| label: Away Match teratitory plot
+#| title: Away Match teratitory plot
 #| echo: false
 #| message: false
 #| warning: false
-
 #| fig-width: 4
 #| fig-height: 3.6
 #| fig-dpi: 200
@@ -3712,7 +3701,7 @@ ggplot() +
     plot.caption = element_markdown(),
     legend.title = element_text(colour = "black", size = 6),
     legend.text  = element_text(colour = "black", size = 6),
-    axis.title = element_text(colour = "black", size = 8),
+    axis.title = element_text(colour = "black", size = 6),
     
     plot.margin  = margin(28, 20, 48, 20)
   ) +
@@ -3730,7 +3719,11 @@ ggplot() +
 
 # Pass Maps
 ```{r}
-# data wrangling for pass connection tables
+#| title: data wrangling for pass connection tables
+#| echo: false
+#| message: false
+#| warning: false
+#| output: false
 
 PassConnections <- plottingData 
 PassConnections <- PassConnections[complete.cases(PassConnections[, "playerId"]), ]
@@ -3787,6 +3780,11 @@ PassConnectiondata <- PassConnections %>%
 ```{r}
 #| title: Home 1st Half passnetwork
 #| label: Home 1st Half passnetwork
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 
 
@@ -3801,6 +3799,11 @@ HomepassPlot1stWD
 ```{r}
 #| title: home 2nd Half passnetwork
 #| label: Home 2nd Half passnetwork
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 
 
@@ -3814,6 +3817,11 @@ HomepassPlot2ndWD
 ``` {r}
 #| title: Passnetwork first Goal 
 #| label: Home passnetwork First Goal
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 HomepassPlot20m <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Home, scale_stat = "EPV", 
@@ -3825,7 +3833,11 @@ HomepassPlot20m
 ```{r}
 #| title: Away 1st Half passnetwork
 #| label: Away 1st Half passnetwork
+#| echo: false
+#| message: false
+#| warning: false
 
+#| fig-dpi: 200
 
 
 AwaypassPlot1stWD <- plot_passnet_AI(data = plottingData,  
@@ -3839,7 +3851,11 @@ AwaypassPlot1stWD
 ```{r}
 #| title: Away 2nd Half passnetwork
 #| label: Away 2nd Half passnetwork
+#| echo: false
+#| message: false
+#| warning: false
 
+#| fig-dpi: 200
 
 
 AwaypassPlot2ndWD <- plot_passnet_AI(data = plottingData,  
@@ -3853,7 +3869,11 @@ AwaypassPlot2ndWD
 ``` {r}
 #| title: Passnetwork First Goal 
 #| label: Away passnetwork first Goal
+#| echo: false
+#| message: false
+#| warning: false
 
+#| fig-dpi: 200
 
 AwaypassPlot20m <- plot_passnet_AI(data = plottingData,  
                                    team_name = Match_Away, scale_stat = "EPV", 
@@ -3867,6 +3887,11 @@ AwaypassPlot20m
 ```{r}
 #| title: Home Passnetwork to 1st Sub 
 #| label: Home 1st subs passnetwork
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 HomepassPlot1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                    team_name = Match_Home, scale_stat = "EPV", 
@@ -3879,6 +3904,11 @@ HomepassPlot1stsubsWD
 ``` {r}
 #| title: Home Passnetwork Post 1st Sub 
 #| label: Home post 1st subs passnetwork
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 HomepassPlotPost1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Home, scale_stat = "EPV", 
@@ -3891,7 +3921,11 @@ HomepassPlotPost1stsubsWD
 ```{r}
 #| title: Away Passnetwork to 1st Sub 
 #| label: Away 1st subs passnetwork
+#| echo: false
+#| message: false
+#| warning: false
 
+#| fig-dpi: 200
 
 AwaypassPlot1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                    team_name = Match_Away, scale_stat = "EPV", 
@@ -3904,6 +3938,11 @@ AwaypassPlot1stsubsWD
 ``` {r}
 #| title: Away Passnetwork post 1st Sub 
 #| label: Away post 1st subs passnetwork
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 AwaypassPlotpost1stsubsWD <- plot_passnet_AI(data = plottingData, 
                                         team_name = Match_Away, scale_stat = "EPV", 
@@ -3916,6 +3955,11 @@ AwaypassPlotpost1stsubsWD
 ```{r}
 #| title: Home Attacking Passnetwork 1st Half
 #| label: Home Attacking Passnetwork 1st Half
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
 
 HomepassPlot1stAtt <- plot_passnet_AI(data = plottingData, 
                                   team_name = Match_Home, scale_stat = "EPV", 
@@ -3929,8 +3973,12 @@ HomepassPlot1stAtt
 ```{r}
 #| title: Home Attacking Passnetwork 2nd Half
 #| label: Home Attacking Passnetwork 2nd Half
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Home 2nd half
+#| fig-dpi: 200
+
 HomepassPlot2ndAtt <- plot_passnet_AI(data = plottingData,
                                   team_name = Match_Home, scale_stat = "EPV", 
                                   scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " 2nd Half"),
@@ -3942,8 +3990,12 @@ HomepassPlot2ndAtt
 ```{r}
 #| title: Home Attacking Passnetwork 1st Goal
 #| label: Home Attacking Passnetwork 1st Goal
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Home 2nd half
+#| fig-dpi: 200
+
 HomepassPlot20mA <- plot_passnet_AI(data = plottingData,
                                   team_name = Match_Home, scale_stat = "EPV", 
                                   scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " up to First Goal"),
@@ -3956,8 +4008,12 @@ HomepassPlot20mA
 ```{r}
 #| title: Away Attacking Passnetwork 1st Half
 #| label: Away Attacking Passnetwork 1st Half
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Away 1st half
+#| fig-dpi: 200
+
 AwaypassPlot1stAtt <- plot_passnet_AI(data = plottingData, 
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away, text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " 1st Half"),
@@ -3969,8 +4025,12 @@ AwaypassPlot1stAtt
 ```{r}
 #| title: Away Attacking Passnetwork 2nd Half
 #| label: Away Attacking Passnetwork 2nd Half
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Away 2nd half
+#| fig-dpi: 200
+
 AwaypassPlot2ndAtt <- plot_passnet_AI(data = plottingData,
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away, text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " 2nd Half"),
@@ -3981,8 +4041,12 @@ AwaypassPlot2ndAtt
 ```{r}
 #| title: Away Attacking Passnetwork 1st Goal
 #| label: Away Attacking Passnetwork 1st Goal
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Away 2nd half
+#| fig-dpi: 200
+
 AwaypassPlot2ndAtt20m <- plot_passnet_AI(data = plottingData,
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away, text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " up to First Goal"),
@@ -3995,8 +4059,12 @@ AwaypassPlot2ndAtt20m
 ```{r}
 #| title: Home Attacking Passnetwork 1st Sub
 #| label: Home Attacking Passnetwork 1st Sub
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Home 1st sub
+#| fig-dpi: 200
+
 HomepassPlot1subAtt <- plot_passnet_AI(data = plottingData,  
                                     team_name = Match_Home, scale_stat = "EPV", 
                                     scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " up to 1st Sub"),
@@ -4008,8 +4076,12 @@ HomepassPlot1subAtt
 ```{r}
 #| title: Home Attacking Passnetwork Post 1st Sub
 #| label: Home Attacking Passnetwork Post 1st Sub
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Home 1st sub
+#| fig-dpi: 200
+
 HomepassPlot1subAttpost <- plot_passnet_AI(data = plottingData,  
                                     team_name = Match_Home, scale_stat = "EPV", 
                                     scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " Post 1st Subs"),
@@ -4021,8 +4093,12 @@ HomepassPlot1subAttpost
 ```{r}
 #| title: Away Attacking Passnetwork 1st Sub
 #| label: Away Attacking Passnetwork 1st Sub
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Away 1st Sub
+#| fig-dpi: 200
+
 AwaypassPlot1SubAtt <- plot_passnet_AI(data = plottingData,
                                       team_name = Match_Away, scale_stat = "EPV", 
                                       scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " up to 1st Sub"),
@@ -4034,8 +4110,12 @@ AwaypassPlot1SubAtt
 ```{r}
 #| title: Away Attacking Passnetwork Post 1st Sub
 #| label: Away Attacking Passnetwork Post 1st Sub
+#| echo: false
+#| message: false
+#| warning: false
 
-#pass map EPV Away 1st Sub
+#| fig-dpi: 200
+
 AwaypassPlot1SubAttpost <- plot_passnet_AI(data = plottingData,
                                       team_name = Match_Away, scale_stat = "EPV", 
                                       scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " Post 1st Subs"),
@@ -4048,6 +4128,12 @@ AwaypassPlot1SubAttpost
 ### Home {.tabset}
 ```{r}
 #| title: Home Passnetwork - By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 HomepassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                       team_name = Match_Home, scale_stat = "EPV", 
                                       scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4056,6 +4142,12 @@ HomepassPlotFTAttW
 ```
 ```{r}
 #| title: Home Passnetwork - By Game Quarter
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 HomepassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                       team_name = Match_Home, scale_stat = "EPV", 
                                       scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4065,6 +4157,12 @@ HomepassPlotFTAttW
 
 ```{r}
 #| title: Home Attacking Passnetwork - By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 HomepassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                       team_name = Match_Home, scale_stat = "EPV", 
                                       scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4073,6 +4171,12 @@ HomepassPlotFTAttW
 ```
 ```{r}
 #| title: Home Attacking Passnetwork - By Game Quarter
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 HomepassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                       team_name = Match_Home, scale_stat = "EPV", 
                                       scale_color = Color_Home,  text_color = Color_Home_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4083,6 +4187,12 @@ HomepassPlotFTAttW
 ### Away {.tabset}
 ```{r}
 #| title: Away Passnetwork - By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 AwaypassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4091,6 +4201,12 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Passnetwork - By Game Quarter
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 AwaypassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4099,6 +4215,12 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Attacking Passnetwork - By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
 AwaypassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4107,6 +4229,13 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Attacking Passnetwork - By Game Quarter
+#| echo: false
+#| message: false
+#| warning: false
+
+#| fig-dpi: 200
+
+
 AwaypassPlotFTAttW <- plot_passnet_AI(data = plottingData,  
                                      team_name = Match_Away, scale_stat = "EPV", 
                                      scale_color = Color_Away,  text_color = Color_Away_Text, subtitle = paste0(Match_Fixture, " By Time Period"),
@@ -4226,6 +4355,7 @@ PassConnectionTableHomeR
 #| title: Away Pass Connections by Passer
 #| results: asis
 #| label: away Pass connections table
+
 PassConnectionTableAway <- PassConnectiondata %>%
   filter(Receiver_Team == Match_Away,
          Passer_Team == Match_Away) %>%
@@ -4278,6 +4408,7 @@ PassConnectionTableAway
 #| title: Away Pass Connections by Receiver
 #| results: asis
 #| label: away Pass connections table Reciever
+
 PassConnectionTableAwayr <- PassConnectiondata %>%
   filter(Receiver_Team == Match_Away,
          Passer_Team == Match_Away) %>%
@@ -4351,7 +4482,7 @@ PassConnectionTreeHomePlot <- PassConnectionTreeHome %>%
                              fontface = "italic") +
   geom_treemap_text(colour = "black",
                     place = "centre",
-                    size = 13,
+                    size = 10,
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
@@ -4364,9 +4495,9 @@ PassConnectionTreeHomePlot <- PassConnectionTreeHome %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -4399,7 +4530,7 @@ PassConnectionTreeAwayPlot <- PassConnectionTreeAway %>%
                              fontface = "italic") +
   geom_treemap_text(colour = "black",
                     place = "centre",
-                    size = 13,
+                    size = 10,
                     grow = FALSE) +
   #formatting
   theme(legend.position = "none",
@@ -4412,9 +4543,9 @@ PassConnectionTreeAwayPlot <- PassConnectionTreeAway %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -4429,6 +4560,12 @@ PassConnectionTreeAwayPlot
 ```{r}
 #| label:  Home Passing Wave plot
 #| title:  Home wave plot
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
 
 touchpass_bar_data <- plottingData 
 
@@ -4480,11 +4617,11 @@ touchpass_bar_plot <- touchpass_bar_data %>%
          x = "Match Time (Mins)",
          y = "Metric Total") +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(size = 12),
+        plot.subtitle = element_text(size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
-        axis.title = element_text(face = "bold", size = 12),
-        axis.text = element_text(size = 8),
+        axis.title = element_text(face = "bold", size = 6),
+        axis.text = element_text(size = 6),
         panel.grid.major = element_line(colour = "#454545", linewidth = 0.4, linetype = "dashed"),
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
@@ -4497,6 +4634,13 @@ touchpass_bar_plot
 ```{r}
 #| label:  Away Passing Wave plot
 #| title:  Away wave plot
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 Awaytouchpass_bar_data <- plottingData 
 
 Awaytouchpass_bar_data <- Awaytouchpass_bar_data %>%
@@ -4548,11 +4692,11 @@ Awaytouchpass_bar_plot <- Awaytouchpass_bar_data %>%
          x = "Match Time (Mins)",
          y = "Metric Total") +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(size = 12),
+        plot.subtitle = element_text(size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
-        axis.title = element_text(face = "bold", size = 12),
-        axis.text = element_text(size = 8),
+        axis.title = element_text(face = "bold", size = 6),
+        axis.text = element_text(size = 6),
         panel.grid.major = element_line(colour = "#454545", linewidth = 0.4, linetype = "dashed"),
         panel.grid.minor = element_blank(),
         panel.background = element_blank(),
@@ -4564,6 +4708,10 @@ Awaytouchpass_bar_plot
 
 ```{r}
 #| output: false
+#| echo: false
+#| message: false
+#| warning: false
+
 # Step 1: Filter successful passes open play only
 successful_passes <- plottingData 
 
@@ -4727,13 +4875,18 @@ passing_sequencesAway_2nd_Table <- passing_sequencesAway_2nd_Table %>%
 ## Passing Chains Plots {.flow}
 ```{r}
 #| label: Home passing chains all in
+#| title: Home Passing chains
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
 
 passing_sequencesHome_Plot <- passing_sequencesHome %>%
   ggplot(aes(x = x, y = y, group = Pchain)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -4743,9 +4896,9 @@ passing_sequencesHome_Plot <- passing_sequencesHome %>%
   geom_path(color = passing_sequencesHome$Pchain) +
   geom_segment(
     aes(xend = lead(x), yend = lead(y)),
-    arrow = arrow(type = "closed", length = unit(0.09, "cm")),
+    arrow = arrow(type = "closed", length = unit(0.06, "cm")),
     lineend = "round",
-    linewidth = 0.08,
+    linewidth = 0.01,
     color = passing_sequencesHome$Pchain
   ) +
   # add goal
@@ -4755,16 +4908,16 @@ passing_sequencesHome_Plot <- passing_sequencesHome %>%
   facet_grid(factor(Pchain_Length, levels = c("VLow", "Low", "Medium", "High")) ~ Game_Period) +
   
   #format it
-  labs(title = paste0(Match_Home, " Passing Chain Length (5, 6-10, 11-15, 16 +) by Game Period"), 
+  labs(title = paste0(Match_Home, " Passing Chain Length \n(5, 6-10, 11-15, 16 +) by Game Period"), 
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
-  theme(plot.title = element_text(colour = "black", face = "bold", size = 14),
-        plot.subtitle = element_text(colour = "black", size = 12),
+  theme(plot.title = element_text(colour = "black", face = "bold", size = 10),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
         legend.position = "none",
-        strip.text = element_text(size = 6, colour = Color_Home_Text),
+        strip.text = element_text(size = 4, colour = Color_Home_Text),
         strip.background = element_rect(fill = Color_Home, color = "black", linetype = "solid", linewidth = 1))
 
 passing_sequencesHome_Plot
@@ -4772,13 +4925,18 @@ passing_sequencesHome_Plot
 
 ```{r}
 #| label: Away passing chains all in
+#| title: Away Passing Chains
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
 
 passing_sequencesAway_Plot <- passing_sequencesAway %>%
   ggplot(aes(x = x, y = y, group = Pchain)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -4788,9 +4946,9 @@ passing_sequencesAway_Plot <- passing_sequencesAway %>%
   geom_path(color = passing_sequencesAway$Pchain) +
   geom_segment(
     aes(xend = lead(x), yend = lead(y)),
-    arrow = arrow(type = "closed", length = unit(0.09, "cm")),
+    arrow = arrow(type = "closed", length = unit(0.06, "cm")),
     lineend = "round",
-    linewidth = 0.08,
+    linewidth = 0.01,
     color = passing_sequencesAway$Pchain
   ) +  
 # add goal
@@ -4800,16 +4958,16 @@ passing_sequencesAway_Plot <- passing_sequencesAway %>%
   facet_grid(factor(Pchain_Length, levels = c("VLow", "Low", "Medium", "High")) ~ Game_Period) +
   
   #format it
-  labs(title = paste0(Match_Away, " Passing Chain Length (5, 6-10, 11-15, 16 +) by Game Period"), 
+  labs(title = paste0(Match_Away, " Passing Chain Length \n(5, 6-10, 11-15, 16 +) by Game Period"), 
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
-  theme(plot.title = element_text(colour = "black", face = "bold", size = 14),
-        plot.subtitle = element_text(colour = "black", size = 12),
+  theme(plot.title = element_text(colour = "black", face = "bold", size = 10),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
         legend.position = "none",
-        strip.text = element_text(size = 6, colour = Color_Away_Text),
+        strip.text = element_text(size = 4, colour = Color_Away_Text),
         strip.background = element_rect(fill = Color_Away, color = "black", linetype = "solid", linewidth = 1))
 
 passing_sequencesAway_Plot
@@ -5066,6 +5224,10 @@ Away_Passing_Chains_2nd_Table
 
 ```{r}
 #| output: false
+#| echo: false
+#| message: false
+#| warning: false
+
 Zone14_Passes_Home_Data <- plottingData %>%
   filter(TeamName == Match_Home,
          Zone_14_Start == 1 | Zone_14_Finish == 1) %>%
@@ -5171,12 +5333,19 @@ Z14_HS_Passes_Away_Data <- Z14_HS_Passes_Away_Data %>%
 ```{r}
 #| title: Home Z14 RS By Half
 #| label: Home Z14 RS By Half
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5189,7 +5358,7 @@ Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "square",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5197,18 +5366,17 @@ Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
     breaks = scales::breaks_width(0.01), 
     name = "Progressive Pass") +
   
-  #facet_grid(Pass_Area ~ Game_Period) +
   facet_grid(factor(Pass_Area, levels = c("LHS", "Zone 14", "RHS")) ~ Half) +
-  #facet_wrap(~ Game_Period, ncol = 4) +
+
   labs(title = PPsTitle_textHalf, 
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 6, colour = Color_Home_Text),
+        strip.text = element_text(size = 4, colour = Color_Home_Text),
         strip.background = element_rect(fill = Color_Home, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5222,13 +5390,17 @@ Zone14_HS_Passes_Home_Plot
 ```{r}
 #| title: Home Z14 RS By Game Period
 #| label: Home Z14 RS By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
 
 Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5241,7 +5413,7 @@ Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "square",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5249,18 +5421,18 @@ Zone14_HS_Passes_Home_Plot <- Z14_HS_Passes_Home_Data %>%
     breaks = scales::breaks_width(0.01), 
     name = "Progressive Pass") +
   
-  #facet_grid(Pass_Area ~ Game_Period) +
+
   facet_grid(factor(Pass_Area, levels = c("LHS", "Zone 14", "RHS")) ~ Game_Period) +
-  #facet_wrap(~ Game_Period, ncol = 4) +
+
   labs(title = PPsTitle_text, 
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 6, colour = Color_Home_Text),
+        strip.text = element_text(size = 4, colour = Color_Home_Text),
         strip.background = element_rect(fill = Color_Home, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5276,13 +5448,19 @@ Zone14_HS_Passes_Home_Plot
 ```{r}
 #| title: Away Z14 RS By Half
 #| label: Away Z14 RS By Half
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
 
 Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5295,7 +5473,7 @@ Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "square",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5308,11 +5486,11 @@ Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 6, colour = Color_Away_Text),
+        strip.text = element_text(size = 4, colour = Color_Away_Text),
         strip.background = element_rect(fill = Color_Away, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5326,12 +5504,17 @@ Zone14_HS_Passes_Away_Plot
 ```{r}
 #| title: Away Z14 RS By Game Period
 #| label: Away Z14 RS By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
+
 Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5344,7 +5527,7 @@ Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "square",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5357,11 +5540,11 @@ Zone14_HS_Passes_Away_Plot <- Z14_HS_Passes_Away_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 6, colour = Color_Away_Text),
+        strip.text = element_text(size = 4, colour = Color_Away_Text),
         strip.background = element_rect(fill = Color_Away, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5376,7 +5559,9 @@ Zone14_HS_Passes_Away_Plot
 ```{r}
 #| echo: false
 #| output: false
-#| 
+#| message: false
+#| warning: false
+
 Long_Passes_Data <- plottingData %>%
   filter(Long_Passes == 1 | Cross_Passes == 1) %>%
   select(TeamName, playerId, x, y, finalX, finalY, C_End_point_X, C_End_point_Y, minute, Successful_Carries, UnSuccessful_Carries, Prog_Carries, Long_Passes, Cross_Passes, Successful_Passes, UnSuccessful_Passes, Prog_Passes, Distance_Metre, Game_Period, period, EPVvalue, xTvalue, Half = period_displayName, Corners, Short_Corners) %>%
@@ -5389,24 +5574,30 @@ Long_Passes_Data <- plottingData %>%
 
 #set LPs title
 LPsTitle_text <- paste0(
-              glue("<span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:10px;'>{Match_Home}</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:10px;'>Successful</span><span style='color:gray12;font-size:10px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:10px;'>Progressive</span><span style='color:gray12;font-size:10px;'>) by Half,</span>"))
+              glue("<span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:8px;'>{Match_Home}</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:8px;'>Successful</span><span style='color:gray12;font-size:8px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:8px;'>Progressive</span><span style='color:gray12;font-size:8px;'>) by Half,</span>"))
 
 AwayLPsTitle_text <- paste0(
-              glue("<span style='font-family:\"Arial Bold\";color:{Color_Away};font-size:10px;'>{Match_Away}</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:10px;'>Successful</span><span style='color:gray12;font-size:10px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:10px;'>Progressive</span><span style='color:gray12;font-size:10px;'>) by Half,</span>"))
+              glue("<span style='font-family:\"Arial Bold\";color:{Color_Away};font-size:8px;'>{Match_Away}</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:8px;'>Successful</span><span style='color:gray12;font-size:8px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:8px;'>Progressive</span><span style='color:gray12;font-size:8px;'>) by Half,</span>"))
 
 LPsTitle_textGP <- paste0(
-              glue("<span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:10px;'>{Match_Home}</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:10px;'>Successful</span><span style='color:gray12;font-size:10px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:10px;'>Progressive</span><span style='color:gray12;font-size:10px;'>) by Game Period,</span>"))
+              glue("<span style='font-family:\"Arial Bold\";color:{Color_Home};font-size:8px;'>{Match_Home}</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:8px;'>Successful</span><span style='color:gray12;font-size:8px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:8px;'>Progressive</span><span style='color:gray12;font-size:8px;'>) by Game Period,</span>"))
 
 AwayLPsTitle_textGP <- paste0(
-              glue("<span style='font-family:\"Arial Bold\";color:{Color_Away};font-size:10px;'>{Match_Away}</span><span style='font-family:\"Arial\";color:gray12;font-size:10px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:10px;'>Successful</span><span style='color:gray12;font-size:10px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:10px;'>Progressive</span><span style='color:gray12;font-size:10px;'>) by Game Period,</span>"))
+              glue("<span style='font-family:\"Arial Bold\";color:{Color_Away};font-size:8px;'>{Match_Away}</span><span style='font-family:\"Arial\";color:gray12;font-size:8px;'> Long Passes & Crosses (</span><span style='font-family:\"Arial Bold\";color:#0000FF;font-size:8px;'>Successful</span><span style='color:gray12;font-size:8px;'> and </span><span style='font-family:\"Arial Bold\";color:#BD1100;font-size:8px;'>Progressive</span><span style='color:gray12;font-size:8px;'>) by Game Period,</span>"))
 ```
 
 ### Home {.tabset}
 ```{r}
-#| out-height: 100%
-#| out-width: 100%
 #| title: Home Long Passes By half
 #| label: Home Long Passes By half
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
+
 Long_Passes_Home_Plot <- Long_Passes_Data %>%
     filter(TeamName == Match_Home ,
            Corners == 0,
@@ -5414,8 +5605,8 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5426,9 +5617,9 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
   geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
-                  length = unit(0.2, "cm")),
+                  length = unit(0.1, "cm")),
     lineend = "round",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5442,11 +5633,11 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 8, colour = Color_Home_Text),
+        strip.text = element_text(size = 4, colour = Color_Home_Text),
         strip.background = element_rect(fill = Color_Home, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5461,6 +5652,12 @@ Long_Passes_Home_Plot
 ```{r}
 #| title: Home Long Passes By Game Period
 #| label: Home Long Passes By Game Period
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
+
+
 Long_Passes_Home_Plot <- Long_Passes_Data %>%
     filter(TeamName == Match_Home,
            Short_Corners == 0,
@@ -5468,8 +5665,8 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5482,7 +5679,7 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "round",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5496,11 +5693,11 @@ Long_Passes_Home_Plot <- Long_Passes_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 8, colour = Color_Home_Text),
+        strip.text = element_text(size = 4, colour = Color_Home_Text),
         strip.background = element_rect(fill = Color_Home, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5513,10 +5710,16 @@ Long_Passes_Home_Plot
 ```
 ### Away {.tabset}
 ``` {r}
-#| out-height: 100%
-#| out-width: 100%
 #| title: Away Long Passes By Half
 #| label: Away Long Passes By Half
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
+
 Long_Passes_Away_Plot <- Long_Passes_Data %>%
     filter(TeamName == Match_Away,
            Corners == 0,
@@ -5524,8 +5727,8 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5536,9 +5739,9 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
   geom_segment(
     aes(x = x, y = y, xend = finalX, yend = finalY, color = Prog_Passes,  tooltip = paste("Player:", playerId, "\nMin", minute, "\nEPV", EPVvalue)),
     arrow = arrow(type = "closed", 
-                  length = unit(0.2, "cm")),
+                  length = unit(0.1, "cm")),
     lineend = "round",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5552,11 +5755,11 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 8, colour = Color_Away_Text),
+        strip.text = element_text(size = 4, colour = Color_Away_Text),
         strip.background = element_rect(fill = Color_Away, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5571,10 +5774,13 @@ Long_Passes_Away_Plot
 ```
 
 ``` {r}
-#| out-height: 100%
-#| out-width: 100%
 #| title: Away Long Passes By Game period
 #| label: Away Long Passes By Game period
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-dpi: 200
+
 Long_Passes_Away_Plot <- Long_Passes_Data %>%
     filter(TeamName == Match_Away, 
            Short_Corners == 0,
@@ -5582,8 +5788,8 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
   ggplot(aes(x = x, y = y)) +
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#95A5A6") +
   theme_pitch() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   # add zone numbers
   geom_text(aes(y = 50, x = 74.7, label = "14"), size = 1, color = "grey", show.legend = FALSE) +
@@ -5596,7 +5802,7 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
     arrow = arrow(type = "closed", 
                   length = unit(0.1, "cm")),
     lineend = "round",
-    linewidth = 0.15) +
+    linewidth = 0.1) +
   
   scale_colour_gradientn(
     colors = c("#0000FF", "#BD1100"),
@@ -5610,11 +5816,11 @@ Long_Passes_Away_Plot <- Long_Passes_Data %>%
        subtitle = paste0(Match_Fixture),
        caption = My_caption) +
   theme(plot.title = element_markdown(),
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         plot.caption = element_markdown(),
         plot.background = element_rect(colour = "snow", fill = "snow"),
         panel.background = element_blank(),
-        strip.text = element_text(size = 8, colour = Color_Away_Text),
+        strip.text = element_text(size = 4, colour = Color_Away_Text),
         strip.background = element_rect(fill = Color_Away, color = "black", linetype = "solid", linewidth = 1),
         legend.background = element_rect(colour = "snow", fill = "snow"),
         legend.position = "none")
@@ -5632,6 +5838,13 @@ Long_Passes_Away_Plot
 ```{r}
 #| title: Home 1st Half Pass receiving Areas
 #| label: Home 1st Half Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 
 HomePRecievedHeatMapplot1Half <- plottingData %>%
   filter(Successful_Passes == 1,
@@ -5643,19 +5856,16 @@ HomePRecievedHeatMapplot1Half <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   #geometrics
   #plot heat map
   stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
-  
-  #set scales
-  scale_fill_gradientn(colors = ColorScale_HomeC) +
-  scale_color_gradientn(colors = ColorScale_HomeC) +
+
+    #set scales
+  scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 1st Half"), 
@@ -5664,12 +5874,13 @@ HomePRecievedHeatMapplot1Half <- plottingData %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
+
 
 HomePRecievedHeatMapplot1Half
 
@@ -5677,6 +5888,13 @@ HomePRecievedHeatMapplot1Half
 ```{r}
 #| title: Home 2nd Half Pass receiving Areas
 #| label: Home 2nd Half Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 HomePRecievedHeatMapplot2Half <- plottingData %>%
   filter(Successful_Passes == 1,
          Short_Corners == 0,
@@ -5687,20 +5905,17 @@ HomePRecievedHeatMapplot2Half <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   #geometrics
 
   #plot heat map
   stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
-  
   #set scales
-  scale_fill_gradientn(colors = ColorScale_HomeC) +
-  scale_color_gradientn(colors = ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 2nd Half"), 
@@ -5709,12 +5924,13 @@ HomePRecievedHeatMapplot2Half <- plottingData %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
+
 
 HomePRecievedHeatMapplot2Half
 
@@ -5723,6 +5939,13 @@ HomePRecievedHeatMapplot2Half
 ```{r}
 #| title: Home Up to 1st Sub Pass receiving Areas
 #| label: Home Up to 1st Sub Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 
 HomePRecievedHeatMapplot1Sub <- plottingData %>%
   filter(Successful_Passes == 1,
@@ -5734,20 +5957,17 @@ HomePRecievedHeatMapplot1Sub <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   #geometrics
   #plot heat map
   stat_density_2d(aes(#color = after_stat(level), 
     fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
-
   #set scales
-  scale_fill_gradientn(colors = ColorScale_HomeC) +
-  scale_color_gradientn(colors = ColorScale_HomeC) +
+  scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play receiving Pass Heat Map \nUp 1st Subs"), 
@@ -5756,12 +5976,13 @@ HomePRecievedHeatMapplot1Sub <- plottingData %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
+
 
 HomePRecievedHeatMapplot1Sub
 ```
@@ -5769,6 +5990,12 @@ HomePRecievedHeatMapplot1Sub
 ```{r}
 #| title: Away 1st Half Pass receiving Areas
 #| label: Away 1st Half Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
 
 AwayPRecievedHeatMapplot1Half <- plottingData %>%
   filter(Successful_Passes == 1,
@@ -5780,20 +6007,15 @@ AwayPRecievedHeatMapplot1Half <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   #geometrics
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
-  
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+
   #set scales
-  scale_fill_gradientn(colors = ColorScale_AwayC) + 
-  #scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
   
   #formatting
   labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Half"), 
@@ -5802,9 +6024,9 @@ AwayPRecievedHeatMapplot1Half <- plottingData %>%
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -5814,6 +6036,12 @@ AwayPRecievedHeatMapplot1Half
 ```{r}
 #| title: Away 2nd Half Pass receiving Areas
 #| label: Away 2nd Half Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
 
 AwayPRecievedHeatMapplot2Half <- plottingData %>%
   filter(Successful_Passes == 1,
@@ -5825,33 +6053,28 @@ AwayPRecievedHeatMapplot2Half <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   #geometrics
 
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
-  
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+
   #set scales
-  scale_fill_gradientn(colors = ColorScale_AwayC) + 
-  #scale_fill_paletteer_c(ColorScale_AwayC) +
-  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
   
   #formatting
-  labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 2nd Half"), 
+  labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Half"), 
        subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Receieved Passes, \nDirection of Attack Left to Right"),
        caption =  My_caption) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -5862,6 +6085,13 @@ AwayPRecievedHeatMapplot2Half
 ```{r}
 #| title: Away Up to 1st Sub Pass receiving Areas
 #| label: Away Up to 1st Sub Pass receiving Areas
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-width: 4
+#| fig-height: 3.6
+#| fig-dpi: 200
+
 
 AwayPRecievedHeatMapplot1Sub <- plottingData %>%
   filter(Attempted_Passes == 1,
@@ -5873,31 +6103,27 @@ AwayPRecievedHeatMapplot1Sub <- plottingData %>%
   annotate_pitch(dimensions = pitch_opta, fill = "#DBDBDB", colour = "#454545") +
   theme_pitch() +
   geom_tile() +
-          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
-        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.3, colour = "#95A5A6") +
+          annotate("segment", y = c(21.1, 36.8, 63.2, 78.9), yend = c(21.1, 36.8, 63.2, 78.9), x = 0, xend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
+        annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83), y = 0, yend = 100, linetype = "longdash", linewidth = 0.2, colour = "#95A5A6") +
   
   #geometrics
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
-  
-  # add zone percentage numbers
-  #geom_text(data = average_PPDANZ1sub, aes(x = x, y = y, label = paste(PPDA, "%")), size = 4) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
 
   #set scales
-  scale_fill_gradientn(colors = ColorScale_AwayC) +
-  scale_color_gradientn(colors = ColorScale_AwayC) +
+  scale_fill_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
+  scale_color_gradientn(colors = ColorScale_AwayC, trans = "sqrt") +
   
   #formatting
-  labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Subs"), 
+  labs(title = paste0(Match_Away," Open Play receiving Pass Heat Map \nUp 1st Half"), 
        subtitle = paste0(Match_Fixture,"  \nIncreased Colour = Higher Receieved Passes, \nDirection of Attack Left to Right"),
        caption =  My_caption) +
   theme(plot.background = element_rect(colour = "snow", fill = "snow"),
         plot.caption = element_markdown(),
         panel.background = element_rect(colour = "snow", fill = "snow"),
-        plot.title = element_text(colour = "black", face = "bold", size = 14),
+        plot.title = element_text(colour = "black", face = "bold", size = 10),
         plot.title.position = "plot",
-        plot.subtitle = element_text(colour = "black", size = 12),
+        plot.subtitle = element_text(colour = "black", size = 8),
         legend.position = "none", 
         legend.background = element_blank(), 
         legend.key = element_blank())
@@ -9475,8 +9701,9 @@ Player_Summary_Plot_Away
 
 # Threat Analysis
 ```{r}
-#| output: false
 #| label: Home EPV Time Data setup
+#| title: Home EPV Time Data setup
+#| output: false
 #| echo: false
 #set final plot data frame
 
@@ -9498,11 +9725,16 @@ EPVPlotData <- EPVPlotData %>%
          Home_Cumalative_EPV = round(Home_Cumalative_EPV,2),
          Home_Cumalative_xG = cumsum(xG),
          Home_Cumalative_xG = round(Home_Cumalative_xG,2)) %>%
-  select(TeamName, expandedMinute, minute, type, Home_Cumalative_EPV, TeamEPV, EPVvalue, Goal_point_Y, Goal_point_X, Cumalative_EPV, Home_Cumalative_EPV, Home_Cumalative_xG, Successful_Passes,Successful_Carries)
+  select(TeamName, expandedMinute, minute, type, Home_Cumalative_EPV, TeamEPV, EPVvalue, Goal_point_Y, Goal_point_X, Cumalative_EPV, Home_Cumalative_EPV, Home_Cumalative_xG, Successful_Passes,Successful_Carries, Goals)
 
 EPVdfHome <- EPVPlotData %>%
   arrange(expandedMinute) %>%
   mutate(EPV_Conversion = (Home_Cumalative_xG/Home_Cumalative_EPV)*100) %>%
+  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
+  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(EPV_Conversion), NA)) %>%
+  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
+  mutate(Goal_point_Y = as.numeric(Goal_point_Y),
+          Goal_point_Y = round(Goal_point_Y,2)) %>%
   mutate(
     EPV_roll5 = slide_dbl(Home_Cumalative_EPV,
                            mean,
@@ -9531,12 +9763,17 @@ AwayEPVPlotData <- AwayEPVPlotData %>%
          Away_Cumalative_EPV = round(Away_Cumalative_EPV,2),
          Away_Cumalative_xG = cumsum(xG),
          Away_Cumalative_xG = round(Away_Cumalative_xG,2)) %>%
-  select(TeamName, expandedMinute, minute, type, Away_Cumalative_EPV, TeamEPV, EPVvalue, Goal_point_Y, Goal_point_X, Cumalative_EPV, Away_Cumalative_EPV, Away_Cumalative_xG, Successful_Passes, Successful_Carries)
+  select(TeamName, expandedMinute, minute, type, Away_Cumalative_EPV, TeamEPV, EPVvalue, Goal_point_Y, Goal_point_X, Cumalative_EPV, Away_Cumalative_EPV, Away_Cumalative_xG, Successful_Passes, Successful_Carries, Goals)
 
 
 EPVdfAway <- AwayEPVPlotData %>%
   arrange(expandedMinute) %>%
   mutate(EPV_Conversion = (Away_Cumalative_xG/Away_Cumalative_EPV)*100) %>%
+  mutate(Goal_point_X = ifelse(str_detect(Goals, "1"), paste0(expandedMinute), NA)) %>%
+  mutate(Goal_point_Y = ifelse(str_detect(Goals, "1"), paste0(EPV_Conversion), NA)) %>%
+  mutate(Goal_point_X = as.numeric(Goal_point_X)) %>%
+  mutate(Goal_point_Y = as.numeric(Goal_point_Y),
+          Goal_point_Y = round(Goal_point_Y,2)) %>%
   mutate(
     EPV_roll5 = slide_dbl(Away_Cumalative_EPV,
                            mean,
@@ -9685,6 +9922,7 @@ AwayEPVTimePlot
 ## Threat Conversion Plots {.flow}
 ```{r}
 #| height: 100%
+#| title: EPV Home Conversion
 #canvas
 HomeEPVConversionPlot <- EPVPlotData %>%
   
@@ -9698,7 +9936,7 @@ HomeEPVConversionPlot <- EPVPlotData %>%
   geom_image(inherit.aes = FALSE, mapping = aes(x = Goal_point_X, y = Goal_point_Y, image = "~/Documents/Dropbox files/AI LFC data/Icons/ball2.png"), size = 0.05) +   
   
   # annotate with goal details
-  geom_label_repel(aes(x = Goal_point_X, y = Goal_point_Y, label = paste0(type, "\nMin:", minute, " EPV:", Goal_point_Y)), size = 2) +
+  geom_label_repel(data = EPVdfHome, aes(x = Goal_point_X, y = Goal_point_Y, label = paste0(type, "\nMin:", minute, " EPV:", Goal_point_Y)), size = 2) +
   
   #formatting
   scale_x_continuous(breaks = seq(0, 135, 15)) +
@@ -9722,8 +9960,9 @@ HomeEPVConversionPlot <- EPVPlotData %>%
 HomeEPVConversionPlot
 ```
 
-```{r EVP away Conversion}
+```{r}
 #| height: 100%
+#| title: EPV away Conversion
 #canvas
 AwayEPVConversionPlot <- AwayEPVPlotData %>%
   
@@ -9737,7 +9976,7 @@ AwayEPVConversionPlot <- AwayEPVPlotData %>%
   geom_image(inherit.aes = FALSE, mapping = aes(x = Goal_point_X, y = Goal_point_Y, image = "~/Documents/Dropbox files/AI LFC data/Icons/ball2.png"), size = 0.05) +   
   
   # annotate with goal details
-  geom_label_repel(aes(x = Goal_point_X, y = Goal_point_Y, label = paste0(type, "\nMin:", minute, " EPV:", Goal_point_Y)), size = 2) +
+  geom_label_repel(data = EPVdfAway, aes(x = Goal_point_X, y = Goal_point_Y, label = paste0(type, "\nMin:", minute, " EPV:", Goal_point_Y)), size = 2) +
   
   #formatting
   scale_x_continuous(breaks = seq(0, 135, 15)) +
