@@ -129,7 +129,7 @@ Game_date <- first(na.omit(plottingData$Game_date))
 GameWeek <- paste0("MD ",MatchDay)
 
 #set viz location for camcorder adn blue sky images
-Vizlocation <- paste0("~/Documents/Dropbox files/AI LFC data/R files/AI UP/Scripts/Viz Pack/Season 2526/EPL/", GameWeek)
+Vizlocation <- paste0("~/Documents/Dropbox files/AI LFC data/R files/DrBartsHubPage/DrBarts2526/Season 2526/EPL/", GameWeek)
 #####################################
 
 #set pk time
@@ -4131,6 +4131,7 @@ AwaypassPlot1SubAttpost
 ### Home {.tabset}
 ```{r}
 #| title: Home Passnetwork - By Game Period
+#| label: Home Passnetwork - By Game Period
 #| echo: false
 #| message: false
 #| warning: false
@@ -4145,6 +4146,7 @@ HomepassPlotFTAttW
 ```
 ```{r}
 #| title: Home Passnetwork - By Game Quarter
+#| label: Home Passnetwork - By Game Quarter
 #| echo: false
 #| message: false
 #| warning: false
@@ -4160,6 +4162,7 @@ HomepassPlotFTAttW
 
 ```{r}
 #| title: Home Attacking Passnetwork - By Game Period
+#| label: Home Attacking Passnetwork - By Game Period
 #| echo: false
 #| message: false
 #| warning: false
@@ -4174,6 +4177,7 @@ HomepassPlotFTAttW
 ```
 ```{r}
 #| title: Home Attacking Passnetwork - By Game Quarter
+#| label: Home Attacking Passnetwork - By Game Quarter
 #| echo: false
 #| message: false
 #| warning: false
@@ -4190,6 +4194,7 @@ HomepassPlotFTAttW
 ### Away {.tabset}
 ```{r}
 #| title: Away Passnetwork - By Game Period
+#| label: Away Passnetwork - By Game Period
 #| echo: false
 #| message: false
 #| warning: false
@@ -4204,6 +4209,7 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Passnetwork - By Game Quarter
+#| label: Away Passnetwork - By Game Quarter
 #| echo: false
 #| message: false
 #| warning: false
@@ -4218,6 +4224,7 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Attacking Passnetwork - By Game Period
+#| label: Away Attacking Passnetwork - By Game Period
 #| echo: false
 #| message: false
 #| warning: false
@@ -4232,6 +4239,7 @@ AwaypassPlotFTAttW
 ```
 ```{r}
 #| title: Away Attacking Passnetwork - By Game Quarter
+#| label: Away Attacking Passnetwork - By Game Quarter
 #| echo: false
 #| message: false
 #| warning: false
@@ -15938,7 +15946,7 @@ xGSituationBarAway_I
 Home_S_plot <- plot_shot_AI(Homedashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team", mapName = Match_Home, teamColor = Color_Home, text_color = Color_Home_Text, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta", logo = "", wrap = "")
 
 #save Plot
-#ggsave(path = Vizlocation, "Home Team Shot Map.png", width = 2500, height = 2150, units = "px", dpi = 400)
+ggsave(path = Vizlocation, "Home Team Shot Map.png", width = 2500, height = 2150, units = "px", dpi = 400)
 
 Home_S_plot_I <- ggplotly(Home_S_plot, tooltip = "text")
 
@@ -16009,6 +16017,8 @@ Home_S_plotWT_I
 Away_S_plot <- plot_shot_AI(Awaydashboard_data, highlight_goals = TRUE, average_location = FALSE, mapType = "Team",  mapName = Match_Away, teamColor = Color_Away, matchDate = Game_date, matchFixture = Match_Fixture, dataSource = "Opta")
 
 
+#save Plot
+ggsave(path = Vizlocation, "Away Team Shot Map.png", width = 2500, height = 2150, units = "px", dpi = 400)
 
 Away_S_plot_I <- ggplotly(Away_S_plot, tooltip = "text")
 
