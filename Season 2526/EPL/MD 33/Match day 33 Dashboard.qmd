@@ -1522,7 +1522,7 @@ plot_passnet_AI <- function(data,
 
 if (pressmap == "Yes") {
   PressData <- data %>%
-    filter(TeamName == team_name, Defensive_Action == 1)
+    filter(TeamName == team_name, Ground_Duels_Total == 1 | Aerial_total == 1)
 }
 
 plotCaption <- paste0(
@@ -1692,8 +1692,10 @@ nodes <- nodes %>%
           filter(TeamName == team_name) 
         
         PressData <- PressData %>%
-          filter(Defensive_Action == 1)
-
+          #filter(Defensive_Action == 1)
+          filter(Ground_Duels_Total == 1 |
+           Aerial_total == 1)
+          
       } else if (pressmap == "") {
         
       }
