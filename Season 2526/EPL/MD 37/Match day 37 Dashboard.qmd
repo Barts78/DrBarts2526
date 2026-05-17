@@ -2271,6 +2271,47 @@ MatchSummaryGameNameData <- compute_summary(SeasonData, group_vars = c("game_nam
 MatchSummaryGameNameData <- MatchSummaryGameNameData %>%
   select('Fixture' = game_name, Match_day, 'Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes,  'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
 
+
+SeasonData_Cody <- SeasonData %>%
+  filter(game_name %in% c(
+    "Fulham vs Liverpool",
+    "Liverpool vs Tottenham",
+    "Brighton vs Liverpool",
+    "Liverpool vs Chelsea",
+    "Aston Villa vs Liverpool"
+  ))
+
+MatchSummarySeasonData_Cody <- compute_summary(SeasonData_Cody, group_vars = c("Team_Group")) 
+
+MatchSummarySeasonData_Cody <- MatchSummarySeasonData_Cody %>%
+  select('Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes, 'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
+
+MatchSummarySeasonHalfData_Cody <- compute_summary(SeasonData_Cody %>% mutate(Half = case_when(
+  period == 1 ~ "First Half",
+  period == 2 ~ "Second Half",
+  period == 3 ~ "First Half Extra Time",
+  period == 4 ~ "Second Half Extra Time",
+  TRUE ~ "Injury Time")
+), group_vars = c("Half", "Team_Group"))
+
+MatchSummarySeasonHalfData_Cody <- MatchSummarySeasonHalfData_Cody %>%
+  select(Half, 'Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes, 'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
+
+MatchSummarySeasonPeriodData_Cody <- compute_summary(SeasonData_Cody, group_vars = c("Game_Period", "Team_Group"))
+
+MatchSummarySeasonPeriodData_Cody <- MatchSummarySeasonPeriodData_Cody %>%
+  select(Game_Period, 'Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'ONT Shots' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes, 'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
+
+MatchSummarySeasonGameStateData_Cody <- compute_summary(SeasonData_Cody, group_vars = c("Game_State", "Team_Group"))
+
+MatchSummarySeasonGameStateData_Cody <- MatchSummarySeasonGameStateData_Cody %>%
+  select(Game_State, 'Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes,  'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
+
+MatchSummaryGameNameData_Cody <- compute_summary(SeasonData_Cody, group_vars = c("game_name", "Team_Group"))
+
+MatchSummaryGameNameData_Cody <- MatchSummaryGameNameData_Cody %>%
+  select('Fixture' = game_name, Match_day, 'Team' = Team_Group, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'Attempted Passes' = Attempted_Passes,  'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control, 'EPV % NPxG Con.')
+
 ```
 
 
@@ -2315,6 +2356,8 @@ MatchSummaryGameStateData <- compute_summary(plottingData, group_vars = c("Game_
 
 MatchSummaryGameStateData <- MatchSummaryGameStateData %>%
   select(Game_State, 'Team' = TeamName, 'Possession %' = Possession, 'On Ball Time' = In_play_time, Touches, 'PKBox Touches' = PK_Box_Touches, 'Field Tilt %' = Field_Tilt, 'Total Shots' = TotalShots, 'OFF Shots' = OFShots, 'SoT' = OTShots, '6yrd box Shots' = SixYard_Box_Shots, 'PK Box Shots' = PK_Box_Shots, 'Outside Box Shots' = Out_Box_Shots, 'Blocked Shots' = Blocked_Shot, BCs, Goals, xG, NPxG, xGOT, EPV = TeamEPV, 'EPV % xG Con.', 'EPV % NPxG Con.', 'Attempted Passes' = Attempted_Passes,  'Successful Passes' = Successful_Passes, 'Pass Success %' = Pass_Success, 'Long Passes' = Long_Passes, 'Long Ball Rate' = Long_Pass_Rate,  'Crosses' = Cross_Passes, 'Cross Success %' = Cross_Success, Corners, 'Short Corners' = Short_Corners, 'Possession Control' = Posession_Control)
+
+
 
 ```
 
@@ -3110,6 +3153,312 @@ MatchSummaryGameNameData <- MatchSummaryGameNameData %>%
 MatchSummaryGameNameTable
 
 ```
+``` {r}
+#| title: Cody as 9 Summary Tables
+#| results: asis
+#| label: Cody 9 summary tables
+
+MatchSummarySeasonTable <- MatchSummarySeasonData_Cody %>%
+  gt(groupname_col = "Team") %>%
+  cols_hide('On Ball Time') %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = md("**Season Summary - Full Games**"),
+    subtitle = paste0("Up to ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  fmt_number(
+    columns = c(3, 14:17),
+    decimals = 2
+  ) %>%
+  fmt_percent(
+    columns = c(2, 6, 19, 22, 24, 26, 30),
+    decimals = 1,
+    scale_values = FALSE
+  ) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "black")),
+    locations = cells_row_groups(groups = "All Oppo")) %>%
+  tab_style(
+    style = list(cell_text(weight = "bold", color = "white"), cell_fill(color = "red4")),
+    locations = cells_row_groups(groups = "Liverpool")) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = "#B22222",
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%") %>%
+  tab_style(locations = cells_title(groups = "title"),style = list(cell_text(weight = "bold", size = 16))) 
+MatchSummarySeasonTable
+
+MatchSummarySeasonHalfsTable <- MatchSummarySeasonHalfData_Cody %>%
+  gt(rowname_col = "Team", groupname_col = "Half") %>%
+  cols_hide('On Ball Time') %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = md("**Season Summary - By Half**"),
+    subtitle = paste0("Up to ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  fmt_number(
+    columns = c(4, 15:18),
+    decimals = 2
+  ) %>%
+  fmt_percent(
+    columns = c(3, 7, 20, 23, 25, 27, 31),
+    decimals = 1,
+    scale_values = FALSE
+  ) %>%
+  tab_spanner(label = "Possession", columns = c(3:6)) %>%
+  tab_spanner(label = "Shots", columns = c(7:17)) %>%
+  tab_spanner(label = "Passes", columns = c(18:22)) %>%
+  tab_style(
+    locations = cells_column_spanners('Possession'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Shots'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonHalfData_Cody$Half)),
+    style = cell_text(weight = "bold", size = 16, color = "white")
+  ) %>%
+    tab_style(
+    style = list(cell_fill(color = "red4"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"Liverpool"
+    )
+  ) %>%
+  tab_style(
+    style = list(cell_fill(color = "black"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"All Oppo"
+    )
+  ) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = "ivory4",
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%")
+MatchSummarySeasonHalfsTable
+
+MatchSummarySeasonPeriodTable <- MatchSummarySeasonPeriodData_Cody %>%
+  gt(rowname_col = "Team", groupname_col = "Game_Period") %>%
+  cols_hide('On Ball Time') %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = md("**Season Summary - By Game Period**"),
+    subtitle = paste0("Up to ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  fmt_number(
+    columns = c(4, 15:18),
+    decimals = 2
+  ) %>%
+  fmt_percent(
+    columns = c(3, 7, 20, 23, 25, 27, 31),
+    decimals = 1,
+    scale_values = FALSE
+  ) %>%
+  tab_spanner(label = "Possession", columns = c(3:6)) %>%
+  tab_spanner(label = "Shots", columns = c(7:17)) %>%
+  tab_spanner(label = "Passes", columns = c(18:22)) %>%
+  tab_style(
+    locations = cells_column_spanners('Possession'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Shots'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+    tab_style(
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonPeriodData_Cody$Game_Period)),
+    style = cell_text(weight = "bold", size = 16, color = "white")
+  ) %>%
+  tab_style(
+    style = list(cell_fill(color = "red4"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"Liverpool"
+    )
+  ) %>%
+  tab_style(
+    style = list(cell_fill(color = "black"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"All Oppo"
+    )
+  ) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = "ivory4",
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%")
+MatchSummarySeasonPeriodTable
+
+MatchSummarySeasonGameStateTable <- MatchSummarySeasonGameStateData_Cody %>%
+  gt(rowname_col = "Team", groupname_col = "Game_State") %>%
+  cols_hide('On Ball Time') %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = md("**Season Summary - By Game State**"),
+    subtitle = paste0("Up to ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  fmt_number(
+    columns = c(5, 15:18),
+    decimals = 2
+  ) %>%
+  fmt_percent(
+    columns = c(3, 7, 20, 23, 25, 27, 31),
+    decimals = 1,
+    scale_values = FALSE
+  ) %>%
+  tab_spanner(label = "Possession", columns = c(3:6)) %>%
+  tab_spanner(label = "Shots", columns = c(7:17)) %>%
+  tab_spanner(label = "Passes", columns = c(18:22)) %>%
+  tab_style(
+    locations = cells_column_spanners('Possession'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Shots'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    style = list(cell_fill(color = "red4"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"Liverpool"
+    )
+  ) %>%
+  tab_style(
+    style = list(cell_fill(color = "black"),
+                 cell_text(size = 16, weight = "bold", color = "white")),
+    locations = cells_stub(
+      rows = Team == !!"All Oppo"
+    )
+  ) %>%
+    tab_style(
+    locations = cells_row_groups(groups = unique(MatchSummarySeasonGameStateData_Cody$Game_State)),
+    style = cell_text(weight = "bold", size = 16, color = "white")
+  ) %>%
+  
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = "ivory4",
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%")
+MatchSummarySeasonGameStateTable
+
+MatchSummaryGameNameData <- MatchSummaryGameNameData_Cody %>%
+  mutate(Match_day = as.numeric(Match_day)) %>%
+  filter(!Match_day == 0) %>%
+  arrange(Match_day)
+  
+  MatchSummaryGameNameTable <- MatchSummaryGameNameData_Cody %>%
+  gt(rowname_col = "Team", groupname_col = "Match_day") %>%
+  cols_hide('On Ball Time') %>%
+  cols_align(align = "right", columns = everything()) %>%
+  tab_header(
+    title = md("**Season Summary - By Match Day**"),
+    subtitle = paste0("Up to ", Match_Fixture)) %>%
+  tab_source_note(md(My_caption)) %>%
+  fmt_number(
+    columns = c(6, 16:19),
+    decimals = 2
+  ) %>%
+  fmt_percent(
+    columns = c(4, 8, 21, 24, 26, 28, 32),
+    decimals = 1,
+    scale_values = FALSE
+  ) %>%
+  tab_spanner(label = "Possession", columns = c(3:6)) %>%
+  tab_spanner(label = "Shots", columns = c(7:17)) %>%
+  tab_spanner(label = "Passes", columns = c(18:22)) %>%
+  tab_style(
+    locations = cells_column_spanners('Possession'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Shots'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_column_spanners('Passes'),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_style(
+    locations = cells_row_groups(groups = as.character(unique(MatchSummaryGameNameData_Cody$Match_day))),
+    style = cell_text(weight = "bold", size = 16, color = "white")
+  ) %>%
+  tab_style(
+    locations = cells_stub(rows = Team == "All Oppo"),
+    style = list(cell_fill(color = "black"),
+                 cell_text(size = 16, weight = "bold", color = "white"))) %>%
+  tab_style(
+    locations = cells_stub(rows = Team == "Liverpool"),
+    style = list(cell_fill(color = "red4"),
+                cell_text(size = 16,  weight = "bold", color = "white"))) %>%
+  tab_style(
+    locations = cells_title(groups = "title"),
+    style = list(cell_text(weight = "bold", size = 16))) %>%
+  tab_options(
+    heading.padding = px(1),
+    heading.align = "left",
+    column_labels.background.color = "#DBDBDB",
+    row_group.background.color = "ivory4",
+    stub.background.color = "#DBDBDB",
+    column_labels.border.bottom.color = "black",
+    summary_row.background.color = "#DBDBDB",
+    table.font.size = 14,
+    heading.title.font.size = 16,
+    heading.subtitle.font.size = 14,
+    source_notes.font.size = 8,
+    table.width = "100%")
+MatchSummaryGameNameTable
+
+```
+
 
 ## Match Probablity
 ### Match Goals {.tabset}
