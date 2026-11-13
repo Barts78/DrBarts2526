@@ -964,6 +964,7 @@ TouchTeamPlot_OPTA <- function(
              x = 0, xend = 100, linewidth = 0.5, colour = "#95A5A6", linetype = "longdash") +
     annotate("segment", x = c(17, 33.2, 50, 66.4, 83), xend = c(17, 33.2, 50, 66.4, 83),
              y = 0, yend = 100, linewidth = 0.5, colour = "#95A5A6", linetype = "longdash") +
+    
     #plot player touch area
     geom_polygon(aes(x = x, y = y, fill = playerId, colour = playerId), alpha = 0.15, size = 0.5) +
     #plot player average position
@@ -10636,8 +10637,7 @@ EPVHeatMapplot1H <- EPVHeatMapData1H %>%
   geom_point(data = AwayAverage_Player1H, aes(x, y), fill = Color_Away, size = 8, shape = 21, colour = "black", stroke = 0.5, alpha = 0.4) +
   
   #plot heat map
-  stat_density_2d(aes(#color = after_stat(level), 
-    fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
+  stat_density_2d(aes(fill = after_stat(level)), geom = "polygon", alpha = 0.5, adjust = 0.5, linewidth = 0.5) +
   
   # add zone percentage numbers
   geom_text(data = average_epvNZ1H, aes(x = x, y = y, label = paste(PEPV, "%")), size = 4) +
@@ -10646,8 +10646,8 @@ EPVHeatMapplot1H <- EPVHeatMapData1H %>%
   geom_text(data = AwayAverage_Player1H, aes(x, y, label = player_shirt), color = Color_Away_Text, size = 4) +
       
   #set scales
-   scale_fill_gradientn(colors = ColorScale_HomeC) +
-   scale_color_gradientn(colors = ColorScale_HomeC) + 
+   scale_fill_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
+   scale_color_gradientn(colors = ColorScale_HomeC, trans = "sqrt") +
   
   #formatting
   labs(title = paste0(Match_Home," Open Play EPV Heat Map \nFirst Half"), 
